@@ -1,4 +1,5 @@
 ;Guandi97
+;NOTE: currently broken
 ;stack byte array method
 ;determine esi,edi
 ;loop esi
