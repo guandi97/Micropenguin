@@ -1,0 +1,2 @@
+This is Justin's Core Wars Archive.
+Here you will find tutorials written by me that will help you learn the RedCode Assembly dialect as well as some basic strategies to use for your "warriors". 
