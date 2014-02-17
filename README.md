@@ -1,8 +1,8 @@
 Micropenguin Code
 
 
-protocol:
+Protocol:
 
--code should be put in separate folders
+-Keep code in seperate folders. 
 
--link to post should be included within each folder
+-Link is recommended but NOT required. 
