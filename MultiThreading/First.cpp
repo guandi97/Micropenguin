@@ -31,6 +31,9 @@ public:
 			t.join();
 		}
 	}
+
+	thread_guard(thread_guard const&) = delete;      //Makes sure the compiler does not provide a copy constructor by default. THIS IS IMPORTANZZZZ!!! :D
+	thread_guard& operator=(scoped_thread const&) = delete;
 };
 
 class task
