@@ -16,6 +16,9 @@ void function_1(LogFile& log)
 		log.shared_print(string("From t1: "), i);
 }
 
+
+//Launch lots of threads and all share the same data
+//Not thread safe :(
 void function_2(stack& st)
 {
 	int v = st.top();
