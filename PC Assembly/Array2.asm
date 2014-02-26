@@ -32,23 +32,26 @@ _main:
 	
 	mov ebx, array 
 	mov ecx, ARRAY_SIZE
-	mov eax, 2
-
-init_loop:
+	mov eax, 3              
 	
-	mov [ebx], ecx             ;loop decrements value in ecx that gets stored in ebx
+init_loop:
+	;push eax                        ;MUL (EAX * SOURCE)
+	mov eax, ecx                     ;push EAX or else it will be (EAX * ECX * EAX...) 
+	;mul ecx
+	mov [ebx], eax             ;loop decrements value in ecx that gets stored in ebx
 	add ebx, 4                 ;Move down 4 bytes to next address
+	;pop eax
 	loop init_loop                  
 	
 	
 	mov ecx, ARRAY_SIZE
 	mov eax, 0
-	push ecx
+	;push ecx
 
 	print_array:
 	
 	push ecx                     ;Save ECX on Stack lest it gets junked
-	 sub ebx, 4                  ; Move up 4 bytes to next address
+	sub ebx, 4                 ; Move up 4 bytes to next address
 	mov eax, [ebx]               ; Move value at address to EAX register
 	push ebx 
 	push eax
