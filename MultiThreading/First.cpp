@@ -2,8 +2,11 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <mutex>
 
 using namespace std;
+
+mutex mu;
 
 struct func
 {
@@ -17,7 +20,8 @@ struct func
 			cout << "Engie BACON!" << endl;
 	}
 };
-void function_1(string);
+void function_1();
+void shared_print(string, int);
 
 class thread_guard
 {
@@ -68,34 +72,35 @@ public:
 	scoped_thread& operator=(scoped_thread const&) = delete;
 };
 
+/**
 void f()
 {
-	std::vector<std::thread> threads;
-	for (int i = 0; i < 20; i++)
-	{
-		threads.push_back(thread(function_1, "Engie FTW!"));
-	}
-
-	for (int i = 0; i < 20; i++)
-	{
-		threads[i].join();
-	}
-
-	int some_local_state;
-	scoped_thread t(std::thread(func(some_local_state)));
+std::vector<std::thread> threads;
+for (int i = 0; i < 20; i++)
+{
+threads.push_back(thread(function_1, "Engie FTW!"));
 }
 
+for (int i = 0; i < 20; i++)
+{
+threads[i].join();
+}
 
-void function_1(string);
+int some_local_state;
+scoped_thread t(std::thread(func(some_local_state)));
+}
+**/
+
+//void function_1(string);
 
 
 
 int main()
 {
 
-	int local = 0;
-	func my_func(local);
-	thread my_thread(my_func);
+	//int local = 0;
+	//func my_func(local);
+	//thread my_thread(my_func);
 	//Try Catch block is no longer needed if using RAII (Destructor to call .join())
 	/**try
 	{
@@ -108,9 +113,15 @@ int main()
 	**/
 
 
-	my_thread.join();
+	//my_thread.join();
 
-	f();
+	//f();
+	thread t1(function_1);
+
+	for (int i = 0; i < 100; i++)
+		shared_print(string("From main: "), i);
+	//cout << "From main: " << i << endl;
+	t1.join();
 
 	//Oversubscription -- BAD!
 	/**
@@ -125,9 +136,21 @@ int main()
 }
 
 
-void function_1(string msg)
+void function_1()
 {
-	cout << msg << endl;
+	for (int i = 0; i < 100; i++)
+	{
+		//cout << "From t1: " << i << endl;
+		shared_print(string("From t1: "), i);
+	}
+	//cout << msg << endl;
 
 }
 
+
+void shared_print(string msg, int id)
+{
+	mu.lock();                            //lock mutex
+	cout << msg << id << endl;
+	mu.unlock();
+}
