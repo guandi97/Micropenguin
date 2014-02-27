@@ -19,12 +19,7 @@ void function_1(LogFile& log)
 
 //Launch lots of threads and all share the same data
 //Not thread safe :(
-void function_2(stack& st)
-{
-	int v = st.top();
-	st.pop();
-	process(v);
-}
+
 
 int main()
 {
@@ -36,6 +31,8 @@ int main()
 
 
 	t1.join();
+
+	cin.get();
 }
 
 
