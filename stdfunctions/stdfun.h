@@ -5,6 +5,7 @@
 
 #include <unistd.h>
 #include <math.h>
+#include <stdlib.h>
 //debug
 #include <stdio.h>
 
@@ -67,8 +68,27 @@ int ati(char *str)
 }
 int intasc(int source,char *dest)
 {
-	int i,j;
-	return j;
+	int i=0,j=0,*b;
+
+	while((int)(source/j)!=0)
+	{
+		i++;
+		j=pow(10,i);
+	}
+	int size=i-1;
+
+	b=malloc(i);
+	for(i--;i!=0;i--)
+	{
+		*(b+i)=(char)(source/(char)(pow(j,(1/2))));
+	}
+
+	for(i=size;i!=0;i--)
+	{
+		*(dest+i)=0x30+*(b+i);
+	}
+
+	return size;
 }
 int ungReadi(int fd,char *buff,size_t size)
 {
