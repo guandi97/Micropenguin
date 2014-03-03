@@ -21,28 +21,95 @@ bootloader_start:
 	mov ds, ax
 	mov es, ax            ;set up segments
 
-	                      ;set up stack
-	cli                   ;clear interupts
-	mov ss, ax            ;set stack segment pointer to base of stack (takes register as source because it is a segment)
-	mov sp, 4096          ;set stack pointer to top of stack
-	sti                   ;restores interupts
-
-	;mov ax, 07C0h
-	;mov ds, ax               ;move ax into data segment
-	;mov es, ax
-
-	mov [bootdev], dl        ;Saves boot device number (useful for switching drives)
-
-				 ;Now we have to load the root
-	
 	
 
 
+.reset_floppy:
+	mov ah, 0
+	mov dl, 0
+	int 0x13
+	jc .reset_floppy
 
 
+
+load_root:
+	LOAD_ROOT:
+     
+     	; compute size of root directory and store in "cx"
+	;Multiply the number of entrys in the root directory by size of each entry (32 bytes)
+     
+          xor     cx, cx                          ;Make CX = 0
+          xor     dx, dx                          ;Make DX = 0
+          mov     ax, 0x0020                      ; 32 byte directory entry
+          mul     WORD [bpbRootEntries]           ; total size of directory   (AX *= WORD [bpbRootEntries])
+          div     WORD [bpbBytesPerSector]        ; sectors used by directory (AX */ WORD [bpbBytesPerSector])
+          xchg    ax, cx                          ;swaps ax and cx. CX = AX, AX = 0
+          
+     ; compute location of root directory and store in "ax"
+     
+          mov     al, BYTE [bpbNumberOfFATs]       ; number of FATs      
+          mul     WORD [bpbSectorsPerFAT]          ; sectors used by FATs
+          add     ax, WORD [bpbReservedSectors]    ; adjust for bootsector
+          mov     WORD [datasector], ax            ; base of root directory
+          add     WORD [datasector], cx
+          
+     ; read root directory into memory (7C00:0200)
+     
+          mov     bx, 0x0200                        ; copy root dir above bootcode
+          call    ReadSectors
+
+
+;----------------------------------------------------------------
+;FIND DAT STAGE 2
+;----------------------------------------------------------------
+
+	mov cx, [bpbRootEntries]	;Number of entries in Root Dir
+	mov di, 0x0200                  ;Where Root directory was loaded
+.Loop:
+	push cx                         ;Save CX onto Stack
+	mov cx, 11                      ;11 bytes per name
+	mov si, fileName                ;Compare 11 bytes with name of kernel
+	push di				;Save DI onto Stack
+	rep cmpsb			;Repeat 11 times comparing each byte from DI with each byte in SI
+					;Sets ZF flag if equal
+
+	pop di                          ;Restore original value of DI before adding 11 bytes
+	je LOAD_FAT			;If equal jump. (ZF flag set)
+	pop cx
+	add di, 32                      ;Go to the next entry(32 bytes)
+	loop .Loop
+	jmp FAILURE
+
+
+;----------------------------------------------------------------
+;LOAD FAT
+;----------------------------------------------------------------
 	
+	mov dx, [di + 0x001A]          ;After finding stage 2, DI contains the starting address of entry
+
+;----------------------------------------------------------------
+;READ SECTOR INTO MEMORY
+;----------------------------------------------------------------
+Read_Sector:
+
+	mov ax, 0x1000                 ;Writes sector to part memory!
+	mov es, ax                     ;set es to address in memory
+	xor bx, bx		       ;set bx to zero
+				       ;ES:BX buffer address pointer
 
 
+	mov ah, 0x02                   ;Set up registers for INT 0x13 (Read sector into memory address)
+	mov al, 1
+	mov ch, 1
+	mov cl, 2
+	mov dh, 0
+	mov dl, 0
+	int 0x13
+
+	jmp 0x1000:0x0
+				 
+	
+	
 ;------------------------------------------
 ;Data
 
@@ -56,5 +123,3 @@ times 510-($-$$) db 0	        ; Pad remainder of boot sector with zeros
 	dw 0AA55h		; Boot signature (DO NOT CHANGE!) This tells BIOS that disk is bootable
 
 
-buffer:                         ;Where root begins
-	
