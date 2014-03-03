@@ -7,6 +7,29 @@
 ;xor bx, bx clears BX to 0 (xor against oneself always results in zero)
 
 
+;=========================================================
+;BIOS Parameter Block
+
+bpbBytesPerSector:  	DW 512
+bpbSectorsPerCluster: 	DB 1
+bpbReservedSectors: 	DW 1
+bpbNumberOfFATs: 	DB 2
+bpbRootEntries: 	DW 224
+bpbTotalSectors: 	DW 2880
+bpbMedia: 		DB 0xF0
+bpbSectorsPerFAT: 	DW 9
+bpbSectorsPerTrack: 	DW 18
+bpbHeadsPerCylinder: 	DW 2
+bpbHiddenSectors: 	DD 0
+bpbTotalSectorsBig:     DD 0
+bsDriveNumber: 	        DB 0
+bsUnused: 		DB 0
+bsExtBootSignature: 	DB 0x29
+bsSerialNumber:	        DD 0xa0a1a2a3
+bsVolumeLabel: 	        DB "MOSSTHEBOSS"
+bsFileSystem: 	        DB "FAT12   "
+
+;==============================================================
 
 
 BITS 16
@@ -21,7 +44,10 @@ bootloader_start:
 	mov ds, ax
 	mov es, ax            ;set up segments
 
-	
+	mov     ax, 0x0000				; set the stack
+        mov     ss, ax
+        mov     sp, 0xFFFF
+        sti						; restore interrupts
 
 
 .reset_floppy:
@@ -86,6 +112,47 @@ load_root:
 ;----------------------------------------------------------------
 	
 	mov dx, [di + 0x001A]          ;After finding stage 2, DI contains the starting address of entry
+	mov WORD [cluster], dx         ;Save info to variable             
+	
+				       ;Find how many sectors are in both FAT
+				       ;Compute size of FAT
+	xor ax, ax 
+	mov al, [bpbNumberofFATs]
+	mul WORD [bpbSectorsPerFAT]
+        mov cx, ax                               ;CX = number of sectors the FATs use
+	
+	mov ax, WORD[bpbReservedSector]  ;Account for bootsector
+	
+
+	mov bx, 0x0200              
+	call Read_Sector               ;Load FAT Table
+
+	;Read image file to memory
+
+;----------------------------------------------------------------
+;LOAD IMAGE FILE (KERNEL)
+;----------------------------------------------------------------
+	
+Load_Image:
+	mov ax, WORD [cluster]                    ;cluster to read into memory
+	pop bx                                    ;Where to read into
+	call CHS_LBA                              ;Convert cluster to LBA
+	mov cl, BYTE [bpbSectorsPerCluster]       ;Number of sectors to read
+	call Read_Sector
+	push bx
+
+	mov ax, WORD [cluster]              ;Get current cluster
+	mov cx, ax                          ;copy to CX
+	mov dx, ax                          ;copy to DX
+	shr dx, 0x0001
+	add cx, dx
+	mov bx, 0x0200
+	add bx, cx
+	mov dx, WORD [bx]
+	test ax, 0x0001
+	jnz .ODD_CLUSTER
+	
+
 
 ;----------------------------------------------------------------
 ;READ SECTOR INTO MEMORY
