@@ -58,9 +58,14 @@ int 10h
    jc .infotag
   
    mov si, buffer
-   mov di, cmd_prime
+   mov di, cmd_ram
    call strcmp
-   jc .prime
+   jc .ram
+ 
+   ;mov si, buffer           ;Removed Prime call
+   ;mov di, cmd_prime
+   ;call strcmp
+   ;jc .prime
  
    mov si,badcommand
    call print_string 
@@ -80,8 +85,17 @@ int 10h
    mov si, msg_help
    call print_string
    jmp mainloop
- .prime:
-   call _prime
+ 
+ .ram:
+   mov si, msg_ram
+   call print_string
+   int 0x12
+   mov si, ax
+   call print_string
+    
+
+;.prime:
+   ;call _prime
  
    jmp mainloop
  
@@ -89,6 +103,7 @@ int 10h
  msg_helloworld db 'Hello World!', 0x0D, 0x0A, 0
  msg_info db 'Forums.micropenguin.net', 0x0D, 0x0a, 0
  msg_prime db 'Enter a number', 0x0D, 0x0a, 0
+ msg_ram db 'The amount of ram: ', 0x0D, 0x0a, 0
  badcommand db 'Bad command entered.', 0x0D, 0x0A, 0
  msg_out db 'The number you entered: ', 0
  prompt db '>', 0
@@ -96,7 +111,8 @@ int 10h
  cmd_help db 'help', 0
  cmd_info db 'info', 0
  cmd_prime db 'prime',0
- msg_help db 'Pengu: Commands: hi, help, info, prime', 0x0D, 0x0A, 0
+ cmd_ram db 'ram', 0
+ msg_help db 'Pengu: Commands: hi, help, info, ram', 0x0D, 0x0A, 0
  buffer times 64 db 0
  
  ; ================
@@ -195,29 +211,29 @@ int 10h
    ret
 
 
-_prime:
+;_prime:
 
-	mov si, msg_prime
-	call print_string           ;print prompt for number
+	;mov si, msg_prime
+	;call print_string           ;print prompt for number
         
-        mov di, buffer              ;gets user input
-        call get_string
+        ;mov di, buffer              ;gets user input
+        ;call get_string
 	
-	mov si, msg_out            ;prints statement before user input
-	call print_string
+	;mov si, msg_out            ;prints statement before user input
+	;call print_string
 	
 
-	mov si, buffer
-	call print_string
+	;mov si, buffer
+	;call print_string
         
-	mov ah, 0x0E
-   	mov al, 0x0D
-   	int 0x10
-  	 mov al, 0x0A
-   	int 0x10		; newline
+	;mov ah, 0x0E
+   	;mov al, 0x0D
+   	;int 0x10
+  	; mov al, 0x0A
+   	;int 0x10		; newline
        	
-ret
+;ret
 
 
 ;times 510-($-$$) db 0
-  ; dw 0AA55h ; some BIOSes require this signature
+   ;dw 0AA55h ; some BIOSes require this signature

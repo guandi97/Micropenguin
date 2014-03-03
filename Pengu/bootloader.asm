@@ -4,7 +4,7 @@
 ;Offset is a number that is added to a base number
 ;Segment:offset addressing (Add base address[segment] with offset address)
 ;We keep one address fixed (base address) and add a number (offset) to it to reach any location between (0-64kb)
-
+;xor bx, bx clears BX to 0 (xor against oneself always results in zero)
 
 
 
