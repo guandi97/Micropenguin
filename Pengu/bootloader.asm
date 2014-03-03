@@ -82,7 +82,7 @@ load_root:
      ; read root directory into memory (7C00:0200)
      
           mov     bx, 0x0200                        ; copy root dir above bootcode
-          call    ReadSectors
+          call    Read_Sector
 
 
 ;----------------------------------------------------------------
@@ -108,7 +108,7 @@ load_root:
 
 
 ;----------------------------------------------------------------
-;LOAD FAT
+LOAD_FAT:
 ;----------------------------------------------------------------
 	
 	mov dx, [di + 0x001A]          ;After finding stage 2, DI contains the starting address of entry
@@ -117,11 +117,11 @@ load_root:
 				       ;Find how many sectors are in both FAT
 				       ;Compute size of FAT
 	xor ax, ax 
-	mov al, [bpbNumberofFATs]
+	mov al, [bpbNumberOfFATs]
 	mul WORD [bpbSectorsPerFAT]
         mov cx, ax                               ;CX = number of sectors the FATs use
 	
-	mov ax, WORD[bpbReservedSector]  ;Account for bootsector
+	mov ax, WORD[bpbReservedSectors]  ;Account for bootsector
 	
 
 	mov bx, 0x0200              
@@ -151,7 +151,16 @@ Load_Image:
 	mov dx, WORD [bx]
 	test ax, 0x0001
 	jnz .ODD_CLUSTER
-	
+
+.EVEN_CLUSTER:
+	and	dx, 0000111111111111b
+	jmp .DONE
+.ODD_CLUSTER:
+	shr	dx, 0x0004
+.DONE:
+	mov WORD[cluster], dx
+	cmp dx, 0x0FF0
+	jb	Load_Image
 
 
 ;----------------------------------------------------------------
@@ -176,15 +185,57 @@ Read_Sector:
 	jmp 0x1000:0x0
 				 
 	
+
+;-----------------------------------------------------------------
+;Convert CHS to LBA
+
+CHS_LBA:
+          sub     ax, 0x0002                          ; zero base cluster number
+          xor     cx, cx
+          mov     cl, BYTE [bpbSectorsPerCluster]     ; convert byte to word
+          mul     cx
+          add     ax, WORD [datasector]               ; base data sector
+          ret
+;-------------------------------------------------------------------
+
+;-------------------------------------------------------------------
+;Convert LBA to CHS
+LBACHS:
+          xor     dx, dx                              ; prepare dx:ax for operation
+          div     WORD [bpbSectorsPerTrack]           ; calculate
+          inc     dl                                  ; adjust for sector 0
+          mov     BYTE [absoluteSector], dl
+          xor     dx, dx                              ; prepare dx:ax for operation
+          div     WORD [bpbHeadsPerCylinder]          ; calculate
+          mov     BYTE [absoluteHead], dl
+          mov     BYTE [absoluteTrack], al
+          ret
+;---------------------------------------------------------------------
+
+
+ FAILURE:
+     
+          mov     si, msgFailure
+          int 0x10
+          mov     ah, 0x00
+          int     0x16                                ; await keypress
+          int     0x19                                ; warm boot computer
+
+
 	
 ;------------------------------------------
 ;Data
 
 bootdev db 0                                           ;boot device number (used by int 13h)
-filename db "KERNEL  BIN"                              ;must be 11 bytes in size
+fileName db "KERNEL  BIN"                              ;must be 11 bytes in size
 FirstSector dw 0
 msg db "hello!", 0
-
+datasector db "",0
+absoluteSector db 0x00
+absoluteHead   db 0x00
+absoluteTrack  db 0x00
+cluster     dw 0x0000
+msgFailure  db 0x0D, 0x0A, "ERROR : Press Any Key to Reboot", 0x0A, 0x00
 
 times 510-($-$$) db 0	        ; Pad remainder of boot sector with zeros
 	dw 0AA55h		; Boot signature (DO NOT CHANGE!) This tells BIOS that disk is bootable
