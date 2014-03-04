@@ -7,6 +7,8 @@
 ;xor bx, bx clears BX to 0 (xor against oneself always results in zero)
 
 ;FAT: http://www.eit.lth.se/fileadmin/eit/courses/eitn50/Projekt1/FAT12Description.pdf
+;(Cluster - 2) Y??? Here's why: http://stackoverflow.com/questions/14785723/converting-the-cluster-number-stored-in-fat-table-of-fat12-filesystem-for-read
+
 
 
 BITS 16						; we are in 16 bit real mode
@@ -70,7 +72,7 @@ ReadSectors:
           push    ax
           push    bx
           push    cx
-          call    LBACHS                              ; convert starting sector to CHS
+          call    LBACHS                              ; convert starting sector to CHS (Needed for Int 0x13)
 		  mov     ah, 0x02                            ; BIOS read sector
           mov     al, 0x01                            ; read one sector
           mov     ch, BYTE [absoluteTrack]            ; track
@@ -104,10 +106,10 @@ ReadSectors:
 ;************************************************;
 
 ClusterLBA:
-          sub     ax, 0x0002                          ; zero base cluster number
+          ;sub     ax, 0x0002                          ; zero base cluster number
           xor     cx, cx
           mov     cl, BYTE [bpbSectorsPerCluster]     ; convert byte to word
-          mul     cx
+          mul     cl
           add     ax, WORD [datasector]               ; base data sector
 		  
           ret
@@ -265,11 +267,11 @@ main:
      ;----------------------------------------------------
 
      LOAD_IMAGE:
-     
+                                               
           mov     ax, WORD [cluster]                  ; cluster to read
           pop     bx                                  ; buffer to read into
-          call    ClusterLBA                          ; convert cluster to LBA
-          ;xor     cx, cx
+          call    ClusterLBA                          ; convert cluster to LBA      (So we can Read it in)
+          ;xor     cx, cx								;NOTE: Cluster numbers are relative to the partition and NOT the start of the disk
           ;mov     cl, BYTE [bpbSectorsPerCluster]     ; sectors to read
           call    ReadSectors                          ;(ES:BX from above)
           push    bx
