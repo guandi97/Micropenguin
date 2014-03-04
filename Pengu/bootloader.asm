@@ -93,22 +93,21 @@ load_root:
 ;FIND DAT STAGE 2
 ;----------------------------------------------------------------
 
-	mov cx, [bpbRootEntries]	;Number of entries in Root Dir
-	mov di, 0x0200                  ;Where Root directory was loaded
-.Loop:
-	push cx                         ;Save CX onto Stack
-	mov cx, 11                      ;11 bytes per name
-	mov si, fileName                ;Compare 11 bytes with name of kernel
-	push di				;Save DI onto Stack
-	rep cmpsb			;Repeat 11 times comparing each byte from DI with each byte in SI
-					;Sets ZF flag if equal
-
-	pop di                          ;Restore original value of DI before adding 11 bytes
-	je LOAD_FAT			;If equal jump. (ZF flag set)
-	pop cx
-	add di, 32                      ;Go to the next entry(32 bytes)
-	loop .Loop
-	jmp FAILURE
+	; browse root directory for binary image
+          mov     cx, WORD [bpbRootEntries]             ; load loop counter
+          mov     di, 0x0200                            ; locate first root entry
+     .LOOP:
+          push    cx
+          mov     cx, 0x000B                            ; eleven character name
+          mov     si, fileName                         ; image name to find
+          push    di
+     rep  cmpsb                                         ; test for entry match
+          pop     di
+          je      LOAD_FAT
+          pop     cx
+          add     di, 0x0020                            ; queue next directory entry
+          loop    .LOOP
+          jmp     FAILURE
 
 
 ;----------------------------------------------------------------
@@ -171,6 +170,11 @@ Load_Image:
 	cmp dx, 0x0FF0
 	jb	Load_Image
 
+DONE:
+	mov si, msg_done
+	call Print
+	retf
+	
 
 ;----------------------------------------------------------------
 ;READ SECTOR INTO MEMORY
@@ -221,6 +225,10 @@ LBACHS:
           ret
 ;---------------------------------------------------------------------
 
+Troll:
+	lawl db "Test",0
+	mov si, lawl
+	call Print
 
  FAILURE:
      
@@ -251,6 +259,7 @@ fileName db "KERNEL  BIN"                              ;must be 11 bytes in size
 FirstSector dw 0
 msg db "hello!", 0
 msg_loading db "Pengu Operating System Loading...",0
+msg_done db "Done.",0
 datasector db "",0
 absoluteSector db 0x00
 absoluteHead   db 0x00
