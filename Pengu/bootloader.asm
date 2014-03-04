@@ -7,9 +7,15 @@
 ;xor bx, bx clears BX to 0 (xor against oneself always results in zero)
 
 
+
+BITS 16
+
+jmp short bootloader_start
+nop
 ;=========================================================
 ;BIOS Parameter Block
 
+bpbOEM			db "My OS   "			; OEM identifier (Cannot exceed 8 bytes!)
 bpbBytesPerSector:  	DW 512
 bpbSectorsPerCluster: 	DB 1
 bpbReservedSectors: 	DW 1
@@ -32,11 +38,6 @@ bsFileSystem: 	        DB "FAT12   "
 ;==============================================================
 
 
-BITS 16
-
-jmp short bootloader_start
-nop
-
 bootloader_start:
 	mov ax, 07C0h           ;If the disk is bootable, Then the bootsector will be loaded 
 			        ;at 0x7C00, and INT 0x19 will jump to it, therby giving 
@@ -49,6 +50,9 @@ bootloader_start:
         mov     sp, 0xFFFF
         sti						; restore interrupts
 
+
+	mov si, msg_loading
+	call Print	
 
 .reset_floppy:
 	mov ah, 0
@@ -128,6 +132,11 @@ LOAD_FAT:
 	call Read_Sector               ;Load FAT Table
 
 	;Read image file to memory
+	
+	mov ax, 0x0050
+	mov es, ax 
+	mov bx, 0x0000                    ;Where image will be read to
+	push bx 
 
 ;----------------------------------------------------------------
 ;LOAD IMAGE FILE (KERNEL)
@@ -138,8 +147,8 @@ Load_Image:
 	pop bx                                    ;Where to read into
 	call CHS_LBA                              ;Convert cluster to LBA
 	mov cl, BYTE [bpbSectorsPerCluster]       ;Number of sectors to read
-	call Read_Sector
-	push bx
+	call Read_Sector                          ;Read all sectors used by image file
+	push bx                                   
 
 	mov ax, WORD [cluster]              ;Get current cluster
 	mov cx, ax                          ;copy to CX
@@ -153,10 +162,10 @@ Load_Image:
 	jnz .ODD_CLUSTER
 
 .EVEN_CLUSTER:
-	and	dx, 0000111111111111b
+	and	dx, 0000111111111111b        ;Mask top 4 bits
 	jmp .DONE
 .ODD_CLUSTER:
-	shr	dx, 0x0004
+	shr	dx, 0x0004                   ;Shift down 4 bits
 .DONE:
 	mov WORD[cluster], dx
 	cmp dx, 0x0FF0
@@ -182,7 +191,7 @@ Read_Sector:
 	mov dl, 0
 	int 0x13
 
-	jmp 0x1000:0x0
+	ret
 				 
 	
 
@@ -216,20 +225,32 @@ LBACHS:
  FAILURE:
      
           mov     si, msgFailure
-          int 0x10
+          call Print
           mov     ah, 0x00
           int     0x16                                ; await keypress
           int     0x19                                ; warm boot computer
 
-
-	
 ;------------------------------------------
+
+Print:
+			lodsb				; load next byte from string from SI to AL
+			or	al, al			; Does AL=0?
+			jz	PrintDone		; Yep, null terminator found-bail out
+			mov	ah, 0eh			; Nope-Print the character
+			int	10h
+			jmp	Print			; Repeat until null terminator found
+	PrintDone:
+			ret	
+
+
+
 ;Data
 
 bootdev db 0                                           ;boot device number (used by int 13h)
 fileName db "KERNEL  BIN"                              ;must be 11 bytes in size
 FirstSector dw 0
 msg db "hello!", 0
+msg_loading db "Pengu Operating System Loading...",0
 datasector db "",0
 absoluteSector db 0x00
 absoluteHead   db 0x00
