@@ -1,5 +1,5 @@
-nasm -f bin boot.asm -o boot.bin
-nasm -f bin kernel_new.asm -o kernel.bin
+nasm -f bin boot_new.asm -o boot.bin
+nasm -f bin kernel.asm -o kernel.bin
 copy /b boot.bin boot.img
 
 

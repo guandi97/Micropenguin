@@ -1,19 +1,50 @@
- ;mov ax, 0x07C0  ; set up segments
-  ; mov ds, ax
-  ; mov es, ax
-;------------------------------------------------- 
 
+
+;*********************************************
+;	Stage2.asm
+;		- Second Stage Bootloader
+;
+;	Operating Systems Development Series
+;*********************************************
+
+org 0x0					; offset to 0, we will set segments later
+
+bits 16					; we are still in real mode
+
+; we are loaded at linear address 0x10000
+
+jmp main				; jump to main
+
+;*************************************************;
+;	Prints a string
+;	DS=>SI: 0 terminated string
+;************************************************;
+
+Print:
+	lodsb					; load next byte from string from SI to AL
+	or			al, al		; Does AL=0?
+	jz			PrintDone	; Yep, null terminator found-bail out
+	mov			ah,	0eh		; Nope-Print the character
+	int			10h
+	jmp			Print		; Repeat until null terminator found
+PrintDone:
+	ret					; we are done, so return
+
+;*************************************************;
+;	Second Stage Loader Entry Point
+;************************************************;
+
+main:
+	cli					; clear interrupts
+	push			cs		; Insure DS=CS
+	pop				ds
+
+	mov			si, Msg
+	call			Print
+	
 	
 
 
-
-
-   
-mov ah, 09h             ;Change screen color
-mov cx, 1000h
-mov al, 20h
-mov bl, 17h
-int 10h
 
 	mov si, welcome
    call print_string
@@ -76,10 +107,11 @@ int 10h
  .ram:
    mov si, msg_ram
    call print_string
-   int 0x12
-   mov si, ax
+   ;or ax, ax
+   ;int 0x12
+   mov si, msg_ram
    call print_string
-    
+
 
 ;.prime:
    ;call _prime
@@ -98,6 +130,7 @@ int 10h
  cmd_help db 'help', 0
  cmd_info db 'info', 0
  cmd_prime db 'prime',0
+
  cmd_ram db 'ram', 0
  msg_help db 'Pengu: Commands: hi, help, info, ram', 0x0D, 0x0A, 0
  buffer times 64 db 0
@@ -198,29 +231,14 @@ int 10h
    ret
 
 
-;_prime:
-
-	;mov si, msg_prime
-	;call print_string           ;print prompt for number
-        
-        ;mov di, buffer              ;gets user input
-        ;call get_string
-	
-	;mov si, msg_out            ;prints statement before user input
-	;call print_string
-	
-
-	;mov si, buffer
-	;call print_string
-        
-	;mov ah, 0x0E
-   	;mov al, 0x0D
-   	;int 0x10
-  	; mov al, 0x0A
-   	;int 0x10		; newline
-       	
-;ret
 
 
-;times 510-($-$$) db 0
-   ;dw 0AA55h ; some BIOSes require this signature
+
+	cli					; clear interrupts to prevent triple faults
+	hlt					; hault the syst
+
+;*************************************************;
+;	Data Section
+;************************************************;
+
+Msg	db	"Preparing to load operating system...",13,10,0

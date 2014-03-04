@@ -1,10 +1,13 @@
+;----Some Info-------
+;Segments are sections of memory 64kb in size
+;Registers that store the base address of a segment: CS, DS, ES, SS
+;Offset is a number that is added to a base number
+;Segment:offset addressing (Add base address[segment] with offset address)
+;We keep one address fixed (base address) and add a number (offset) to it to reach any location between (0-64kb)
+;xor bx, bx clears BX to 0 (xor against oneself always results in zero)
 
-;*********************************************
-;	Boot1.asm
-;		- A Simple Bootloader
-;
-;	Operating Systems Development Series
-;*********************************************
+;FAT: http://www.eit.lth.se/fileadmin/eit/courses/eitn50/Projekt1/FAT12Description.pdf
+
 
 BITS 16						; we are in 16 bit real mode
 
@@ -68,7 +71,7 @@ ReadSectors:
           push    bx
           push    cx
           call    LBACHS                              ; convert starting sector to CHS
-          mov     ah, 0x02                            ; BIOS read sector
+		  mov     ah, 0x02                            ; BIOS read sector
           mov     al, 0x01                            ; read one sector
           mov     ch, BYTE [absoluteTrack]            ; track
           mov     cl, BYTE [absoluteSector]           ; sector
@@ -106,27 +109,28 @@ ClusterLBA:
           mov     cl, BYTE [bpbSectorsPerCluster]     ; convert byte to word
           mul     cx
           add     ax, WORD [datasector]               ; base data sector
+		  
           ret
      
 ;************************************************;
 ; Convert LBA to CHS
 ; AX=>LBA Address to convert
 ;
-; absolute sector = (logical sector / sectors per track) + 1
+; absolute sector = (logical sector % sectors per track) + 1
 ; absolute head   = (logical sector / sectors per track) MOD number of heads
 ; absolute track  = logical sector / (sectors per track * number of heads)
 ;
 ;************************************************;
 
 LBACHS:
-          xor     dx, dx                              ; prepare dx:ax for operation
-          div     WORD [bpbSectorsPerTrack]           ; calculate
+		  xor     dx, dx                              ; prepare dx:ax for operation
+          div     WORD [bpbSectorsPerTrack]           ; calculate (AX / WORD [bpbSectorsPerTrack]
           inc     dl                                  ; adjust for sector 0
           mov     BYTE [absoluteSector], dl
           xor     dx, dx                              ; prepare dx:ax for operation
           div     WORD [bpbHeadsPerCylinder]          ; calculate
-          mov     BYTE [absoluteHead], dl
-          mov     BYTE [absoluteTrack], al
+          mov     BYTE [absoluteHead], DL             ;
+          mov     BYTE [absoluteTrack], AL            ;Quotient is returned in AL
           ret
 
 ;*********************************************
@@ -252,7 +256,7 @@ main:
           mov     si, msgCRLF
           call    Print
           mov     ax, 0x0050
-          mov     es, ax                              ; destination for image
+          mov     es, ax                              ; destination for image (ES:BX buffer)
           mov     bx, 0x0000                          ; destination for image
           push    bx
 
@@ -265,9 +269,9 @@ main:
           mov     ax, WORD [cluster]                  ; cluster to read
           pop     bx                                  ; buffer to read into
           call    ClusterLBA                          ; convert cluster to LBA
-          xor     cx, cx
-          mov     cl, BYTE [bpbSectorsPerCluster]     ; sectors to read
-          call    ReadSectors
+          ;xor     cx, cx
+          ;mov     cl, BYTE [bpbSectorsPerCluster]     ; sectors to read
+          call    ReadSectors                          ;(ES:BX from above)
           push    bx
           
      ; compute next cluster
@@ -296,16 +300,19 @@ main:
      
           mov     WORD [cluster], dx                  ; store new cluster
           cmp     dx, 0x0FF0                          ; test for end of file
-          jb      LOAD_IMAGE
+          jb     LOAD_IMAGE
           
      DONE:
      
           mov     si, msgCRLF
           call    Print
-          push    WORD 0x0050
-          push    WORD 0x0000
-          retf
+          ;push    WORD 0x0050
+          ;push    WORD 0x0000
+          ;retf
           
+		  jmp 0x0050:0x0000
+		  
+		  
      FAILURE:
      
           mov     si, msgFailure
@@ -324,6 +331,7 @@ main:
      msgLoading  db 0x0D, 0x0A, "Loading PenguOS.... ", 0x0D, 0x0A, 0x00
      msgCRLF     db 0x0D, 0x0A, 0x00
      msgProgress db ".", 0x00
+	 msg_lol	 db "*", 0
      msgFailure  db 0x0D, 0x0A, "ERROR : Press Any Key to Reboot", 0x0A, 0x00
      
           TIMES 510-($-$$) DB 0
