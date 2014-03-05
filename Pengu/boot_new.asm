@@ -168,11 +168,18 @@ main:
      ; Display loading message
      ;----------------------------------------------------
      
-	 mov ah, 09h             ;Change screen color
+	mov ah, 09h             ;Change screen color
 	mov cx, 1000h
 	mov al, 20h
 	mov bl, 17h
 	int 10h
+	
+	
+	reset_floppy:
+		mov ah, 0
+		mov dl, 0
+		int 0x13
+		jc reset_floppy
 	 
 	 
 	 

@@ -121,9 +121,10 @@ main:
    jmp mainloopz
    
 .time:
-	pusha
-	call print_time
-	popa
+
+	;pusha
+	;call print_time
+	;popa
 	jmp mainloopz
 
 	

@@ -9,6 +9,8 @@ copy kernel.bin B:
 
 imdisk -d -m B:
 
-
-;mkisofs -no-emul-boot -boot-load-size 4 -o PenguOS.iso -b boot.img .
+del kernel.bin
+::Delete kernel.bin because there is already a copy in the image file. 
+:: If kernel.bin is not deleted from the directory, OS will throw Int 0x18
+mkisofs -o Pengu.iso -b boot.img .
 
