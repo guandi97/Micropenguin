@@ -9,6 +9,9 @@
 ;FAT: http://www.eit.lth.se/fileadmin/eit/courses/eitn50/Projekt1/FAT12Description.pdf
 ;(Cluster - 2) Y??? Here's why: http://stackoverflow.com/questions/14785723/converting-the-cluster-number-stored-in-fat-table-of-fat12-filesystem-for-read
 
+;ISO 
+;  //mkisofs -no-emul-boot -boot-load-size 4 -o PenguOS.iso -b myfirst.flp .
+
 
 
 BITS 16						; we are in 16 bit real mode
@@ -106,7 +109,7 @@ ReadSectors:
 ;************************************************;
 
 ClusterLBA:
-          ;sub     ax, 0x0002                          ; zero base cluster number
+          sub     ax, 0x0002                          ; zero base cluster number
           xor     cx, cx
           mov     cl, BYTE [bpbSectorsPerCluster]     ; convert byte to word
           mul     cl
