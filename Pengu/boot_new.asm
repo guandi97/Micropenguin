@@ -271,7 +271,9 @@ main:
           mov     ax, WORD [cluster]                  ; cluster to read
           pop     bx                                  ; buffer to read into
           call    ClusterLBA                          ; convert cluster to LBA      (So we can Read it in)
-          ;xor     cx, cx								;NOTE: Cluster numbers are relative to the partition and NOT the start of the disk
+          ;xor     cx, cx								;NOTE: Cluster numbers are relative to the partition and NOT the start of the disk   (Cluster numbers (0 and 1) are reserved)
+													   ;Convert cluster number to LBA to get absolute disk sector where cluster is stored in the data region
+													   ;http://micropenguin.net/files/Pengu/FAT12Description.pdf
           ;mov     cl, BYTE [bpbSectorsPerCluster]     ; sectors to read
           call    ReadSectors                          ;(ES:BX from above)
           push    bx
