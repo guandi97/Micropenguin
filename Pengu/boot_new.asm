@@ -9,8 +9,8 @@
 ;FAT: http://www.eit.lth.se/fileadmin/eit/courses/eitn50/Projekt1/FAT12Description.pdf
 ;(Cluster - 2) Y??? Here's why: http://stackoverflow.com/questions/14785723/converting-the-cluster-number-stored-in-fat-table-of-fat12-filesystem-for-read
 
-;ISO 
-;  //mkisofs -no-emul-boot -boot-load-size 4 -o PenguOS.iso -b myfirst.flp .
+;ISO (RENAME KERNEL.BIN in current directory, OTHERWISE INT 0x18 ERROR)
+;  //mkisofs -no-emul-boot -boot-load-size 4 -o PenguOS.iso -b boot.img .
 
 
 

@@ -10,4 +10,5 @@ copy kernel.bin B:
 imdisk -d -m B:
 
 
+;mkisofs -no-emul-boot -boot-load-size 4 -o PenguOS.iso -b boot.img .
 

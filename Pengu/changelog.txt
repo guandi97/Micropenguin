@@ -1,0 +1,21 @@
+PenguOS ChangeLog
+
+
+v.03
+-MikeOS integration
+-Capable of running MikeOS programs
+
+v.02
+-Two stage bootloader.
+-Bootloader loads kernel into memory
+
+
+
+v.01
+-Added color screen
+-Started work on Multi-boot
+
+
+v.000000000000001
+-Started on Bootloader
+-Kernel only. Since it is small enough to fit into the boot sector (512 bytes)
