@@ -20,3 +20,4 @@ int ati(char* str)
 memcp(char *data,char *target,size_t size)
 {
 }
+
