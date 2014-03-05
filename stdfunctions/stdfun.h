@@ -5,7 +5,6 @@
 
 #include <unistd.h>
 #include <math.h>
-#include <stdlib.h>
 //debug
 #include <stdio.h>
 
@@ -47,20 +46,8 @@ int ati(char *str)
 		if(*str=='-') i=1;
 		for(i=i;i<k;i++)
 		{
+			j+=(pow(10,l)*(*(str+i)-0x30));
 			l--;
-			switch(*(str+i))
-			{
-				case '0': break;
-				case '1': j+=(pow(10,l)*1); break;
-				case '2': j+=(pow(10,l)*2); break;
-				case '3': j+=(pow(10,l)*3); break;
-				case '4': j+=(pow(10,l)*4); break;
-				case '5': j+=(pow(10,l)*5); break;
-				case '6': j+=(pow(10,l)*6); break;
-				case '7': j+=(pow(10,l)*7); break;
-				case '8': j+=(pow(10,l)*8); break;
-				case '9': j+=(pow(10,l)*9); break;
-			}
 		}
 		if(*str=='-') j*=-1;
 	}
@@ -68,27 +55,8 @@ int ati(char *str)
 }
 int intasc(int source,char *dest)
 {
-	int i=0,j=0,*b;
-
-	while((int)(source/j)!=0)
-	{
-		i++;
-		j=pow(10,i);
-	}
-	int size=i-1;
-
-	b=malloc(i);
-	for(i--;i!=0;i--)
-	{
-		*(b+i)=(char)(source/(char)(pow(j,(1/2))));
-	}
-
-	for(i=size;i!=0;i--)
-	{
-		*(dest+i)=0x30+*(b+i);
-	}
-
-	return size;
+	int i,j;
+	return j;
 }
 int ungReadi(int fd,char *buff,size_t size)
 {
