@@ -1,13 +1,20 @@
 PenguOS ChangeLog
 
+v.04
+-Removed 998.bin
+
+
 
 v.03
 -MikeOS integration
 -Capable of running MikeOS programs
 
+
+
 v.02
 -Two stage bootloader.
 -Bootloader loads kernel into memory
+-Allows for a larger size kernel.bin
 
 
 
