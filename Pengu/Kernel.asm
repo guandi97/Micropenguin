@@ -12,34 +12,34 @@ bits 16					; we are still in real mode
 
 ; we are loaded at linear address 0x10000
 
-jmp main				; jump to main
+jmp _main				; jump to main
 
 ;*************************************************;
 ;	Prints a string
 ;	DS=>SI: 0 terminated string
 ;************************************************;
 
-Print:
+_Print:
 	lodsb					; load next byte from string from SI to AL
 	or			al, al		; Does AL=0?
-	jz			PrintDone	; Yep, null terminator found-bail out
+	jz			_PrintDone	; Yep, null terminator found-bail out
 	mov			ah,	0eh		; Nope-Print the character
 	int			10h
-	jmp			Print		; Repeat until null terminator found
-PrintDone:
-	ret					; we are done, so return
+	jmp			_Print		; Repeat until null terminator found
+_PrintDone:
+	ret				; we are done, so return
 
 ;*************************************************;
 ;	Second Stage Loader Entry Point
 ;************************************************;
 
-main:
+_main:
 	cli					; clear interrupts
 	push			cs		; Insure DS=CS
 	pop				ds
 
 	mov			si, Msg
-	call			Print
+	call			_Print
 	
 
 	mov si, welcome
@@ -121,7 +121,7 @@ main:
    jmp mainloopz
    
 .time:
-
+	call ls
 	;pusha
 	;call print_time
 	;popa
@@ -147,6 +147,8 @@ main:
  cmd_dir db 'dir',0
  cmd_cli db 'cli', 0
  cmd_time db 'time',0
+ 
+ troll db 'BACK!', 0
 
  cmd_ram db 'ram', 0
  msg_help db 'Pengu: Commands: hi, help, info, ram, cli', 0x0D, 0x0A, 0
@@ -276,6 +278,8 @@ Msg	db	"Preparing to load operating system...",13,10,0
 	%INCLUDE "features/string.asm"
 	%INCLUDE "features/basic.asm"
 	
+	;LEGACY 998
+	%INCLUDE "system/filesys.asm"
 	
 	
 	fmt_12_24	db 0		; Non-zero = 24-hr format
