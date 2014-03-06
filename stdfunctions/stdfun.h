@@ -5,20 +5,21 @@
 
 #include <unistd.h>
 #include <math.h>
+#include <stdlib.h>
 //debug
 #include <stdio.h>
 
 #define stdfun
 
 typedef struct struct_file file;
-int sterlen(char*,char);						//returns incrementer;loops until delim is found
-int ati(char*);								//returns integer value of ascii string
-int intasc(int,char*);							//return length;convert int to ascii 
+int strsize(char*,char);						//returns incrementer;loops until delim is found
+int ascint(char*);							//returns integer value of ascii string
+char* intasc(int,int*);							//return length;convert int to ascii 
 int ungReadi(int,char*,size_t);						//return # bytes read;read, and then clear buffer
 int memcp(char*,char*,size_t);						//return # bytes copied;copy mem by byte
 int readup(int,char*,char);						//return # bytes read;read up until delim
 int buffwrite(char*,file*,size_t);					//return # bytes put in buffer;buffered output
-int fsflush(file*);							//return # bytes flushed;flush file buffer
+int buffflush(file*);							//return # bytes flushed;flush file buffer
 
 
 struct struct_file
@@ -29,20 +30,19 @@ struct struct_file
 	char buff[FBUFF];
 };
 
-int sterlen(char *str,char delim)
+int strsize(char *str,char delim)
 {
 	int i=0;
 	while(*(str+i)!=delim) i++;
 
 	return i;
 }
-int ati(char *str)
+int ascint(char *str)
 {
-	int i,j=0;
-	const int k=sterlen(str,0x0)-1;
+	int i=0,j=0;
+	const int k=strsize(str,0x0)-1;
 	int l=k;
 	{
-		i=0;
 		if(*str=='-') i=1;
 		for(i=i;i<k;i++)
 		{
@@ -53,10 +53,28 @@ int ati(char *str)
 	}
 	return j;
 }
-int intasc(int source,char *dest)
+char* intasc(int source,int *b)
 {
-	int i,j;
-	return j;
+	int c=0,d,i=1,j,l;
+	*b=-1;
+
+	do
+	{
+		d=(int)(source/i);
+		*b+=1;
+		i*=10;
+	}while(d!=0);
+
+	char *s=malloc(*b);
+	l=*b-1;
+
+	for(i=pow(10,(double)l);i!=0;i/=10)
+	{
+		*(s+c++)=((int)(source/i)-(int)(source/(i*10))*10)+0x30;
+	}
+	*(s+c)=0x0;
+
+	return s;
 }
 int ungReadi(int fd,char *buff,size_t size)
 {
@@ -66,7 +84,6 @@ int ungReadi(int fd,char *buff,size_t size)
 	if(i<size) return i;
 	else 
 	{
-		printf("lolz\n");
 		if(buff[i-1]!=0xa) while(read(fd,dump,UNGREADIBUFF)>=UNGREADIBUFF);
 	}
 
@@ -118,7 +135,7 @@ int buffwrite(char *source,file *strmout,size_t size)
 
 	if((FBUFF-strmout->index)<size) 
 	{
-		fsflush(strmout);
+		buffflush(strmout);
 	}
 
 	i=memcp(source,&strmout->buff[strmout->index],size);
@@ -126,7 +143,7 @@ int buffwrite(char *source,file *strmout,size_t size)
 	strmout->index=size;
 	return i;
 }
-int fsflush(file *strmout)
+int buffflush(file *strmout)
 {
 	int i=write(strmout->fd,&strmout->buff,strmout->index);
 	strmout->index=0;
