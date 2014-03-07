@@ -5,10 +5,11 @@
 ;Print each file name
 
 
+
 list_directory:
 	mov cx,	0			; Counter
 
-	mov ax, dir_list			; Get list of files on disk
+	;mov ax, dir_list			; Get list of files on disk
 	call ls
 	mov si, dir_list
 	mov ah, 0Eh			; BIOS teletype function
@@ -59,17 +60,35 @@ pusha
 	popa
 	pusha
 
+	mov si, 0x0200
+	call disk_convert_l2hts
+	mov bx, 0x07c0
+	mov es, bx
+	mov ax, 0x0200
+	mov bx, ax
 	
+	
+	mov ah, 2			;Int 0x13 function code to read disk into memory
+	mov al, 14		    ;Read all 14 sectors containing root directory
+	
+	
+	;push ax
+	;mov ax, 0x0060
+	;mov es, ax
+	;pop ax
+	
+	;mov bx, 0x2
 	stc
 	int 13h				; Read sectors
 
 .show_dir_init:
 	popa
 
-	;========
-	mov ax, 0x07C0
-	mov es, ax
+	;========   (Modifying DS, AX will corrupt this function) (DI, AL, AH)
+	;mov ax, 0x07C0
+	;mov es, ax
 	;mov si, 0x0200
+	;mov ds, ax
 	;============
 	
 	;mov ax, 0
@@ -78,7 +97,7 @@ pusha
 
 
 .start_entry:
-	mov al, [si+11]			; File attributes for entry
+	mov al, [es:si+11]			; File attributes for entry
 	cmp al, 0Fh			; Windows marker, skip it
 	je .skip
 
@@ -97,17 +116,17 @@ pusha
 	mov dx, si			; Beginning of possible entry
 
 .testdirentry:
-	inc si
-	mov al, [si]			; Test for most unusable characters
-	cmp al, ' '			; Windows sometimes puts 0 (UTF-8) or 0FFh
-	jl .nxtdirentry
-	cmp al, '~'
-	ja .nxtdirentry
+	; inc si
+	; mov al, [si]			; Test for most unusable characters
+	; cmp al, ' '			; Windows sometimes puts 0 (UTF-8) or 0FFh
+	; jl .nxtdirentry
+	; cmp al, '~'
+	; ja .nxtdirentry
 
-	inc cx
-	cmp cx, 11			; Done 11 char filename?
-	je .gotfilename
-	jmp .testdirentry
+	; inc cx
+	; cmp cx, 11			; Done 11 char filename?
+	; je .gotfilename
+	; jmp .testdirentry
 
 
 .gotfilename:				; Got a filename that passes testing
@@ -200,3 +219,11 @@ disk_convert_l2hts:
 	Sides dw 2
 	SecsPerTrack dw 18
 	bootdev db 0
+	bpbRootEntries_: 	DW 224
+	lawl db "You found me.",0
+	lawl2 db "YOU FAILED", 0
+	ImageName_ db "KERNEL  BIN"
+	
+	
+
+	

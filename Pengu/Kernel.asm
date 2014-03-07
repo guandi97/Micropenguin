@@ -141,8 +141,6 @@ _main:
 		
 	call list_directory
 
-	
-	
 	;call ls
 	;pusha
 	;call print_time

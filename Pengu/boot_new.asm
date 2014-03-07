@@ -230,7 +230,7 @@ main:
           mov     si, ImageName                         ; image name to find
           push    di
      rep  cmpsb                                         ; test for entry match  (Compares byte at address DS:(E)SI with byte at address	 ES:(E)DI and sets the status flags accordingly)
-          pop     di                                    ;Restore value of DI
+		  pop     di                                    ;Restore value of DI
           je      LOAD_FAT
           pop     cx
           add     di, 0x0020                            ; queue next directory entry
@@ -270,7 +270,7 @@ main:
      
           mov     si, msgCRLF
           call    Print
-          mov     ax, 0x0050
+          mov     ax, 0x0060
           mov     es, ax                              ; destination for image (ES:BX buffer)
           mov     bx, 0x0000                          ; destination for image
           push    bx
@@ -328,7 +328,7 @@ main:
           ;push    WORD 0x0000
           ;retf
           
-		  jmp 0x0050:0x0000
+		  jmp 0x0060:0x0000
 		  
 		  
      FAILURE:
