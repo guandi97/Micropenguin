@@ -39,15 +39,20 @@ list_directory:
 ;;=====================================================
 ls:
 
-pusha
+	pusha
 
-	mov di, dir_list
+	;mov word [.file_list_tmp], ax
 	
+	mov di, dir_list
+
+	mov eax, 0			; Needed for some older BIOSes
+
+	;call disk_reset_floppy		; Just in case disk was changed
+
 	mov ax, 19			; Root dir starts at logical sector 19
 	call disk_convert_l2hts
 
-	;mov si, disk_buffer		; ES:BX should point to our buffer
-	mov si, disk_buffer
+	mov si, disk_buffer		; ES:BX should point to our buffer
 	mov bx, si
 
 	mov ah, 2			; Params for int 13h: read floppy sectors
@@ -59,45 +64,32 @@ pusha
 .read_root_dir:
 	popa
 	pusha
+	
+	
+	mov si, 2000h
+	mov es, si
 
-	mov si, 0x0200
-	call disk_convert_l2hts
-	mov bx, 0x07c0
-	mov es, bx
-	mov ax, 0x0200
-	mov bx, ax
-	
-	
-	mov ah, 2			;Int 0x13 function code to read disk into memory
-	mov al, 14		    ;Read all 14 sectors containing root directory
-	
-	
-	;push ax
-	;mov ax, 0x0060
-	;mov es, ax
-	;pop ax
-	
-	;mov bx, 0x2
 	stc
 	int 13h				; Read sectors
+	;call disk_reset_floppy		; Check we've read them OK
+	jnc .show_dir_init		; No errors, continue
+
+	;call disk_reset_floppy		; Error = reset controller and try again
+	jnc .read_root_dir
+	jmp .done			; Double error, exit 'dir' routine
 
 .show_dir_init:
 	popa
 
-	;========   (Modifying DS, AX will corrupt this function) (DI, AL, AH)
-	;mov ax, 0x07C0
-	;mov es, ax
-	;mov si, 0x0200
-	;mov ds, ax
-	;============
+	mov ax, 0
+	mov si, disk_buffer		; Data reader from start of filenames
+
+
 	
-	;mov ax, 0
-	;mov si, disk_buffer		; Data reader from start of filenames
-
-
+	
 
 .start_entry:
-	mov al, [es:si+11]			; File attributes for entry
+	mov al, [si+11]			; File attributes for entry
 	cmp al, 0Fh			; Windows marker, skip it
 	je .skip
 
@@ -116,17 +108,17 @@ pusha
 	mov dx, si			; Beginning of possible entry
 
 .testdirentry:
-	; inc si
-	; mov al, [si]			; Test for most unusable characters
-	; cmp al, ' '			; Windows sometimes puts 0 (UTF-8) or 0FFh
-	; jl .nxtdirentry
-	; cmp al, '~'
-	; ja .nxtdirentry
+	inc si
+	mov al, [si]			; Test for most unusable characters
+	cmp al, ' '			; Windows sometimes puts 0 (UTF-8) or 0FFh
+	jl .nxtdirentry
+	cmp al, '~'
+	ja .nxtdirentry
 
-	; inc cx
-	; cmp cx, 11			; Done 11 char filename?
-	; je .gotfilename
-	; jmp .testdirentry
+	inc cx
+	cmp cx, 11			; Done 11 char filename?
+	je .gotfilename
+	jmp .testdirentry
 
 
 .gotfilename:				; Got a filename that passes testing
@@ -177,6 +169,7 @@ pusha
 
 	popa
 	ret
+
 
 	
 	

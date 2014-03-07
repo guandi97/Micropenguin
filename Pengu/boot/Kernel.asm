@@ -34,6 +34,15 @@ _PrintDone:
 ;************************************************;
 
 _main:
+	
+	mov ah, 09h             ;Change screen color
+	mov cx, 1000h
+	mov al, 20h
+	mov bl, 17h
+	int 10h
+	
+	
+	
 	cli					; clear interrupts
 	push			cs		; Insure DS=CS
 	pop				ds
@@ -298,20 +307,9 @@ _Printline:
 Msg	db	"Preparing to load operating system...",13,10,0
 
 
-	%DEFINE MIKEOS_VER '4.4'	; OS version number
-	%DEFINE MIKEOS_API_VER 16	; API version for programs to check
+	
 	disk_buffer	equ	24576
 
-	;%INCLUDE "features/cli.asm"
- 	;%INCLUDE "features/disk.asm"
-	;%INCLUDE "features/keyboard.asm"
-	;%INCLUDE "features/math.asm"
-	;%INCLUDE "features/misc.asm"
-	;%INCLUDE "features/ports.asm"
-	;%INCLUDE "features/screen.asm"
-	;%INCLUDE "features/sound.asm"
-	;%INCLUDE "features/string.asm"
-	;%INCLUDE "features/basic.asm"
 	
 	;LEGACY 998
 	%INCLUDE "system/filesys.asm"
