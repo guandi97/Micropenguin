@@ -12,6 +12,7 @@
 ;ISO (RENAME KERNEL.BIN in current directory, OTHERWISE INT 0x18 ERROR)
 ;  //mkisofs -no-emul-boot -boot-load-size 4 -o PenguOS.iso -b boot.img .
 
+;http://homepage.cs.uri.edu/courses/fall2004/hpr108b/FAT.htm
 
 
 
@@ -228,7 +229,7 @@ main:
           mov     cx, 0x000B                            ; eleven character name
           mov     si, ImageName                         ; image name to find
           push    di
-     rep  cmpsb                                         ; test for entry match
+     rep  cmpsb                                         ; test for entry match  (Compares byte at address DS:(E)SI with byte at address	 ES:(E)DI and sets the status flags accordingly)
           pop     di                                    ;Restore value of DI
           je      LOAD_FAT
           pop     cx
@@ -287,6 +288,7 @@ main:
 													   ;Convert cluster number to LBA to get absolute disk sector where cluster is stored in the data region
 													   ;http://micropenguin.net/files/Pengu/FAT12Description.pdf
           ;mov     cl, BYTE [bpbSectorsPerCluster]     ; sectors to read
+		  
           call    ReadSectors                          ;(ES:BX from above)
           push    bx
           

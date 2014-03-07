@@ -41,6 +41,23 @@ _main:
 	mov			si, Msg
 	call			_Print
 	
+	mov si, line1
+	call _Print
+	call _Printline
+	mov si, line2
+	call _Print
+	call _Printline
+	mov si, line3
+	call _Print
+	call _Printline
+	mov si, line4
+	call _Print
+	call _Printline
+	mov si, line5
+	call _Print
+	call _Printline
+	
+	
 
 	mov si, welcome
    call print_string
@@ -79,9 +96,9 @@ _main:
    jc .ram
    
    mov si, buffer
-   mov di, cmd_time
+   mov di, cmd_dir
    call strcmp
-   jc	.time
+   jc	.dir
    
    mov si, buffer
    mov di, cmd_cli
@@ -120,8 +137,13 @@ _main:
    call print_string
    jmp mainloopz
    
-.time:
-	call ls
+.dir:
+		
+	call list_directory
+
+	
+	
+	;call ls
 	;pusha
 	;call print_time
 	;popa
@@ -129,7 +151,7 @@ _main:
 
 	
 .cli:
-	call os_command_line
+	;call os_command_line
    jmp mainloopz
  
  welcome db 'Welcome to Pengu!', 0x0D, 0x0A, 0
@@ -148,7 +170,11 @@ _main:
  cmd_cli db 'cli', 0
  cmd_time db 'time',0
  
- troll db 'BACK!', 0
+line1 db '   ___                     ____  ____',0
+line2 db '  / _ \___ ___  ___ ___ __/ __ \/ __/',0
+line3 db ' / ___/ -_) _ \/ _ `/ // / /_/ /\ \  ',0
+line4 db '/_/   \__/_//_/\_, /\_,_/\____/___/  ',0
+line5 db '              /___/                  ',0
 
  cmd_ram db 'ram', 0
  msg_help db 'Pengu: Commands: hi, help, info, ram, cli', 0x0D, 0x0A, 0
@@ -250,7 +276,18 @@ _main:
    ret
 
 
+_Printline:
+	pusha
 
+	mov ah, 0Eh			; BIOS output char code
+
+	mov al, 13
+	int 10h
+	mov al, 10
+	int 10h
+
+	popa
+	ret
 
 
 	;cli					; clear interrupts to prevent triple faults
@@ -267,16 +304,16 @@ Msg	db	"Preparing to load operating system...",13,10,0
 	%DEFINE MIKEOS_API_VER 16	; API version for programs to check
 	disk_buffer	equ	24576
 
-	%INCLUDE "features/cli.asm"
- 	%INCLUDE "features/disk.asm"
-	%INCLUDE "features/keyboard.asm"
-	%INCLUDE "features/math.asm"
-	%INCLUDE "features/misc.asm"
-	%INCLUDE "features/ports.asm"
-	%INCLUDE "features/screen.asm"
-	%INCLUDE "features/sound.asm"
-	%INCLUDE "features/string.asm"
-	%INCLUDE "features/basic.asm"
+	;%INCLUDE "features/cli.asm"
+ 	;%INCLUDE "features/disk.asm"
+	;%INCLUDE "features/keyboard.asm"
+	;%INCLUDE "features/math.asm"
+	;%INCLUDE "features/misc.asm"
+	;%INCLUDE "features/ports.asm"
+	;%INCLUDE "features/screen.asm"
+	;%INCLUDE "features/sound.asm"
+	;%INCLUDE "features/string.asm"
+	;%INCLUDE "features/basic.asm"
 	
 	;LEGACY 998
 	%INCLUDE "system/filesys.asm"

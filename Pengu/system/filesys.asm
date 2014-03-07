@@ -8,10 +8,9 @@
 list_directory:
 	mov cx,	0			; Counter
 
-	mov ax, dirlist			; Get list of files on disk
-	call os_get_file_list
-
-	mov si, dirlist
+	mov ax, dir_list			; Get list of files on disk
+	call ls
+	mov si, dir_list
 	mov ah, 0Eh			; BIOS teletype function
 
 .repeat:
@@ -22,7 +21,8 @@ list_directory:
 	cmp al, ','			; If comma in list string, don't print it
 	jne .nonewline
 	pusha
-	call os_print_newline		; But print a newline instead
+	;call os_print_newline		; But print a newline instead
+	call _Printline
 	popa
 	jmp .repeat
 
@@ -31,31 +31,26 @@ list_directory:
 	jmp .repeat
 
 .done:
-	call os_print_newline
-	jmp get_cmd
-	
+	;call os_print_newline
+	call _Printline
+	;jmp get_cmd
+	ret
 ;;=====================================================
-_os_get_file_list:
-	pusha
+ls:
 
-	;mov word [.file_list_tmp], ax
+pusha
 
-	;mov eax, 0			; Needed for some older BIOSes
-
-	call disk_reset_floppy		; Just in case disk was changed
-
-	;mov ax, 19			; Root dir starts at logical sector 19  (Reserved Sectors(1) + FATs( 2 * 9))
-	;call disk_convert_l2hts
+	mov di, dir_list
+	
+	mov ax, 19			; Root dir starts at logical sector 19
+	call disk_convert_l2hts
 
 	;mov si, disk_buffer		; ES:BX should point to our buffer
-	;mov bx, si
+	mov si, disk_buffer
+	mov bx, si
 
-	mov si, 0x200
-	mov bx, 0x7c00
-	
-	
 	mov ah, 2			; Params for int 13h: read floppy sectors
-	mov al, 18			; And read 14 of them
+	mov al, 14			; And read 14 of them
 
 	pusha				; Prepare to enter loop
 
@@ -64,24 +59,22 @@ _os_get_file_list:
 	popa
 	pusha
 
+	
 	stc
 	int 13h				; Read sectors
-	;call disk_reset_floppy		; Check we've read them OK
-	;jnc .show_dir_init		; No errors, continue
-	
-	call .show_dir_init
-	
-	;call disk_reset_floppy		; Error = reset controller and try again
-	;jnc .read_root_dir
-	;jmp .done			; Double error, exit 'dir' routine
 
 .show_dir_init:
 	popa
 
-	mov ax, 0
+	;========
+	mov ax, 0x07C0
+	mov es, ax
+	;mov si, 0x0200
+	;============
+	
+	;mov ax, 0
 	;mov si, disk_buffer		; Data reader from start of filenames
 
-	mov word di, 0 ;[.file_list_tmp]	; Name destination buffer
 
 
 .start_entry:
@@ -100,10 +93,9 @@ _os_get_file_list:
 	je .done
 
 
-	;mov cx, 1			; Set char counter
+	mov cx, 1			; Set char counter
 	mov dx, si			; Beginning of possible entry
-	mov cx, 11
-	
+
 .testdirentry:
 	inc si
 	mov al, [si]			; Test for most unusable characters
@@ -112,13 +104,11 @@ _os_get_file_list:
 	cmp al, '~'
 	ja .nxtdirentry
 
-	;inc cx
-	;cmp cx, 11			; Done 11 char filename?
-	;je .gotfilename
-	;jmp .testdirentry
-	loop .testdirentry
-	
-	
+	inc cx
+	cmp cx, 11			; Done 11 char filename?
+	je .gotfilename
+	jmp .testdirentry
+
 
 .gotfilename:				; Got a filename that passes testing
 	mov si, dx			; DX = where getting string
@@ -169,5 +159,44 @@ _os_get_file_list:
 	popa
 	ret
 
+	
+	
+;====================================================
+disk_convert_l2hts:
+	push bx
+	push ax
+
+	mov bx, ax			; Save logical sector
+
+	mov dx, 0			; First the sector
+	div word [SecsPerTrack]		; Sectors per track
+	add dl, 01h			; Physical sectors start at 1
+	mov cl, dl			; Sectors belong in CL for int 13h
+	mov ax, bx
+
+	mov dx, 0			; Now calculate the head
+	div word [SecsPerTrack]		; Sectors per track
+	mov dx, 0
+	div word [Sides]		; Floppy sides
+	mov dh, dl			; Head/side
+	mov ch, al			; Track
+
+	pop ax
+	pop bx
+
+; ******************************************************************
+	mov dl, [bootdev]		; Set correct device
+; ******************************************************************
+
+	ret	
+	
+	
+	
+	
 
 	.file_list_tmp		dw 0
+	dir_list times 1024 db 0
+	
+	Sides dw 2
+	SecsPerTrack dw 18
+	bootdev db 0
