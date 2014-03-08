@@ -363,8 +363,6 @@ ClusterLBA:
 
 ; ==================================================================
 
-
-
 Print:
 			lodsb				; load next byte from string from SI to AL
 			or	al, al			; Does AL=0?
