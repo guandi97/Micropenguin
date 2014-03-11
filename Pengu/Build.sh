@@ -15,3 +15,5 @@ sleep 2.0
 umount tmp-loop
 rm -rf tmp-loop
 
+
+mkisofs -o Pengu.iso -b boot.img .
