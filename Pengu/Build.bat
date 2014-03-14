@@ -1,12 +1,14 @@
-nasm -f bin boot_new.asm -o boot.bin
-nasm -f bin kernel.asm -o kernel.bin
+del Pengu.iso
+
+nasm -f bin boot\boot.asm -o boot.bin
+nasm -f bin boot\kernel.asm -o kernel.bin
 
 copy /b boot.bin boot.img
 
 
 imdisk -a -f boot.img -s 1440K -m B:
 copy kernel.bin B:
-
+copy Test.txt B:
 imdisk -d -m B:
 
 del kernel.bin
