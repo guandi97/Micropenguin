@@ -148,7 +148,7 @@ _main:
    
 .dir:
 		
-	;call list_directory
+	call list_directory
 
 	;call ls
 	;pusha
@@ -312,7 +312,7 @@ Msg	db	"Preparing to load operating system...",13,10,0
 
 	
 	;LEGACY 998
-	;%INCLUDE "system/filesys.asm"
+	%INCLUDE "system/filesys.asm"
 	
 	
 	fmt_12_24	db 0		; Non-zero = 24-hr format
