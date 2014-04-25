@@ -44,7 +44,7 @@ class x16 {
 			
 			if(arr_in.length==2) {
 				if(arr_in[0].equals("push")) {
-					pu(arr_in[1],stack);
+					stack.add(arr_in[1];
 				}
 				else if(arr_in[0].equals("view")) {
 					if(arr_in[1].matches("\\d+")) {
@@ -114,9 +114,6 @@ class x16 {
 				System.out.println("You suck!\nCommands: push [string],pop,peek,visual");
 			}
 		}
-	}
-	static void pu(String comp,Stack<String> stack) {
-		stack.add(comp);
 	}
 	static String vis(int ptroff,Stack<String> stack) {
 		if(stack.isEmpty()==true) {
