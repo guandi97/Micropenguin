@@ -12,7 +12,7 @@ import java.io.OutputStreamWriter;
 
 class x16 {
 	public static void main(String args[]) {
-		InputStreamReader isr_in=new InputStreamReader(System.in);	//legacy+special operations
+		InputStreamReader isr_in=new InputStreamReader(System.in);
 		BufferedReader br_in=new BufferedReader(isr_in);		//string methods apply
 		OutputStreamWriter osw_out=new OutputStreamWriter(System.out);
 		String buff_in=new String();
@@ -80,7 +80,7 @@ class x16 {
 						System.exit(1);
 					}
 				}
-				else if(arr_in[0].equals("peek")) { 		//no method cause too lazy to set IO objects to global
+				else if(arr_in[0].equals("peek")) { 		
 					try {
 						String buffer=pe(stack);
 						if(buffer==null) continue;
