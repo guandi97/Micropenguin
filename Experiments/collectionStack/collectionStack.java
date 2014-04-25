@@ -44,7 +44,7 @@ class x16 {
 			
 			if(arr_in.length==2) {
 				if(arr_in[0].equals("push")) {
-					stack.add(arr_in[1];
+					stack.add(arr_in[1]);
 				}
 				else if(arr_in[0].equals("view")) {
 					if(arr_in[1].matches("\\d+")) {
