@@ -4,14 +4,12 @@ import java.io.*;
 
 class BufferRape
 {
-
-
 	public static void main(String args[]) {
 		InputStreamReader opIn=new InputStreamReader(System.in);
 		DataOutputStream opOut=new DataOutputStream(System.out);
 		boolean cbuffi=true;
-		CharBuffer cbuff=CharBuffer.allocate(100);
-		char[] opChar=new char[512];		//1.0kb
+		CharBuffer cbuff=CharBuffer.allocate(512);	//1.0kb
+		char[] opChar=new char[512];			//1.0kb
 		String opStr=null;
 		int i=0,d=0;
 		CharArrayReader carRed=null;
@@ -62,7 +60,6 @@ class BufferRape
 	static void bput(DataOutputStream opOut,InputStreamReader opIn,CharBuffer cbuff,boolean cbuffi,char[] opChar) {
 	 	int i=0;
 		try {
-//			opOut.write(Character.getNumericValue('n'));
 			i=opIn.read(opChar);
 		} catch(IOException e) {
 			System.err.println(e);
@@ -72,7 +69,7 @@ class BufferRape
 			cbuff.flip();
 		}
 		cbuff.put(opChar,0,i-1);
-		cbuff.position(cbuff.position()-1);
+		//cbuff.position(cbuff.position()-1);
 	}
 	static void bwrite(DataOutputStream opOut,CharBuffer cbuff,boolean cbuffi,BufferedReader bradar) {
 		if(cbuffi==false) {
@@ -80,8 +77,8 @@ class BufferRape
 			cbuff.flip();
 		}
 		try {
-//			opOut.write(Character.getNumericValue('n'));
 			bradar.read(cbuff);
+			cbuff.position(cbuff.position()-1);
 		} catch(IOException e) {}
 	}
 	static void bget(boolean cbuffi,CharBuffer cbuff,char[] opChar,String opStr,BufferedReader bradar,DataOutputStream opOut,String[] opArr) {
@@ -92,7 +89,7 @@ class BufferRape
 			} catch(IOException e) {}
 			opArr=opStr.split(" ");
 			if(opArr.length==2) break;
-			else if(opArr[0].equals("^/d") && opArr[0].equals("^/d")) {
+			else if(opArr[0].equals("^/d") && opArr[1].equals("^/d")) {
 				i=Integer.getInteger(opArr[0]);	
 				d=Integer.getInteger(opArr[1]);
 				break;
@@ -109,6 +106,7 @@ class BufferRape
 		}
 		cbuff.get(opChar,i,d);
 		try {
+			System.out.println(i+" "+d);
 			System.out.println(opChar);
 			opOut.write(charToByte(opChar),0,(d-i)*2);
 		} catch(IOException e) {}
@@ -125,7 +123,8 @@ class BufferRape
 			} catch(ReadOnlyBufferException e) {
 			} catch(UnsupportedOperationException e) {}
 			try {
-				opOut.write(charToByte(opChar),0,i*2);
+				opOut.write(charToByte(opChar),0,cbuff.position()*2);
+				opOut.write('\n');
 			} catch(IOException e) {}
 		}
 		else {
