@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.regex.*;
 import java.nio.*;
 import java.io.*;
 
@@ -48,6 +49,54 @@ class BufferRape
 			else if(opStr.equals("compact")) {
 				bcompact(cbuff);
 			}
+			else if(opStr.matches("^position.*")) {
+				do {
+					opArr=opStr.split(" ");
+					if(opArr.length==2 && opArr[1].matches("^\\d")) {
+						i=Integer.parseInt(opArr[1]);
+						if(i<=cbuff.position()) {
+							cbuff.position(i);
+							break;
+						}
+					}
+					else if(opArr.length==1) {
+						i=cbuff.position();
+						try {
+							opOut.writeChars(Integer.toString(i)+"\n");
+						} catch(IOException e) {}
+						break;
+					}
+					try {
+						opOut.writeChars("aww Negus!\nusage: index<num> length<num>\n");
+						i=opIn.read(opChar);
+						opStr=new String(opChar,0,i-1);
+					} catch(IOException e) {}
+				}while(true);
+			}
+			else if(opStr.equals("reset")) {
+				cbuff.reset();
+			}
+			else if(opStr.matches("^mark.*")) {
+				do {
+					opArr=opStr.split(" ");
+					if(opArr.length==2 && opArr[1].matches("^\\d")) {
+						i=Integer.parseInt(opArr[1]);
+						if(i<=cbuff.position()) {
+							bmark(cbuff,i);
+							break;
+						}
+					}
+					else if(opArr.length==1) {
+						cbuff.mark();
+						break;
+					}
+					try {
+						opOut.writeChars("aww Negus!\nusage: index<num> length<num>\n");
+						i=opIn.read(opChar);
+						opStr=new String(opChar,0,i-1);
+					} catch(IOException e) {}
+				}while(true);
+			}
 			else {
 				try {
 					opOut.writeChars("ya done goofed\n");
@@ -69,7 +118,7 @@ class BufferRape
 			cbuff.flip();
 		}
 		cbuff.put(opChar,0,i-1);
-		//cbuff.position(cbuff.position()-1);
+		//cbuff.position(cbuff.position()-1);				//deprecieated bcauz line above truncates 0xa automaticly
 	}
 	static void bwrite(DataOutputStream opOut,CharBuffer cbuff,boolean cbuffi,BufferedReader bradar) {
 		if(cbuffi==false) {
@@ -88,15 +137,14 @@ class BufferRape
 				opStr=bradar.readLine();
 			} catch(IOException e) {}
 			opArr=opStr.split(" ");
-			if(opArr.length==2) break;
-			else if(opArr[0].equals("^/d") && opArr[1].equals("^/d")) {
-				i=Integer.getInteger(opArr[0]);	
-				d=Integer.getInteger(opArr[1]);
+			if(opArr.length==2 && opArr[0].matches("^\\d") && opArr[1].matches("^\\d")) {
+				i=Integer.parseInt(opArr[0]);
+				d=Integer.parseInt(opArr[1]);
 				break;
 			}
 			else {
 				try {
-					opOut.writeChars("aww Negus!\nusage: index<num> length<num>");
+					opOut.writeChars("aww Negus!\nusage: index<num> length<num>\n");
 				} catch(IOException e) {}
 			}
 		}while(true);
@@ -106,9 +154,8 @@ class BufferRape
 		}
 		cbuff.get(opChar,i,d);
 		try {
-			System.out.println(i+" "+d);
-			System.out.println(opChar);
 			opOut.write(charToByte(opChar),0,(d-i)*2);
+			opOut.write('\n');
 		} catch(IOException e) {}
 	}
 	static void bread(char[] opChar,CharBuffer cbuff,CharArrayReader carRed,DataOutputStream opOut) {
@@ -135,7 +182,13 @@ class BufferRape
 		cbuff.clear();
 	}
 	static void bcompact(CharBuffer cbuff) {
-		cbuff.compact();
+		cbuff.compact();			//because we "truncate" the \n by moving the position, we don't read it, as a result, it is compacted
+	}
+	static void bmark(CharBuffer cbuff,int i) {
+		int j=cbuff.position();
+		cbuff.position(1);
+		cbuff.mark();
+		cbuff.position(j);
 	}
 	static byte[] charToByte(char[] cbuff) {
 		int d=cbuff.length;
