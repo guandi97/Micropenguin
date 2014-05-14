@@ -40,7 +40,6 @@ class BufferRape
 			}
 			else if(opStr.equals("get")) {
 				bget(cbuffi,cbuff,opChar,opStr,bradar,opOut,opArr);
-
 			}
 			else if(opStr.equals("read")) {
 				bread(opChar,cbuff,carRed,opOut);
@@ -63,7 +62,7 @@ class BufferRape
 	static void bput(DataOutputStream opOut,InputStreamReader opIn,CharBuffer cbuff,boolean cbuffi,char[] opChar) {
 	 	int i=0;
 		try {
-			opOut.write(Character.getNumericValue('\n'));
+//			opOut.write(Character.getNumericValue('n'));
 			i=opIn.read(opChar);
 		} catch(IOException e) {
 			System.err.println(e);
@@ -81,8 +80,8 @@ class BufferRape
 			cbuff.flip();
 		}
 		try {
-			opOut.write(Character.getNumericValue('\n'));
-			bradar.read(cbuff);					//appends unto unknown?
+//			opOut.write(Character.getNumericValue('n'));
+			bradar.read(cbuff);
 		} catch(IOException e) {}
 	}
 	static void bget(boolean cbuffi,CharBuffer cbuff,char[] opChar,String opStr,BufferedReader bradar,DataOutputStream opOut,String[] opArr) {
