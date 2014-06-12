@@ -15,6 +15,7 @@ typedef struct struct_file file;
 int strsize(char*,char);						//returns incrementer;loops until delim is found
 int ascint(char*);							//returns integer value of ascii string
 char* intasc(int,int*);							//return length;convert int to ascii 
+int memcmpr(char*,char*,size_t);
 int ungReadi(int,char*,size_t);						//return # bytes read;read, and then clear buffer
 int memcp(char*,char*,size_t);						//return # bytes copied;copy mem by byte
 int readup(int,char*,char);						//return # bytes read;read up until delim
@@ -34,7 +35,6 @@ int strsize(char *str,char delim)
 {
 	int i=0;
 	while(*(str+i)!=delim) i++;
-
 	return i;
 }
 int ascint(char *str)
@@ -75,6 +75,16 @@ char* intasc(int source,int *b)
 	*(s+c)=0x0;
 
 	return s;
+}
+int memcmpr(char *source,char *destin,size_t len)
+{
+	int i=0;
+	while(*(source+i)==*(destin+i))
+	{
+		if(i<len) i++;
+		else return i;
+	}
+	return i;
 }
 int ungReadi(int fd,char *buff,size_t size)
 {
@@ -141,6 +151,7 @@ int buffwrite(char *source,file *strmout,size_t size)
 	i=memcp(source,&strmout->buff[strmout->index],size);
 	size+=i;
 	strmout->index=size;
+
 	return i;
 }
 int buffflush(file *strmout)
