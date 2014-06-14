@@ -3,7 +3,7 @@ import java.io.*;
 import java.nio.*;
 
 class pootispencer {
-	int baa;
+	int baa; 	//flawed way for spinlock, what if two notices for diferent threads happen before any are caught?
 	Object shrek;
 }
 class numnutz extends Thread {
