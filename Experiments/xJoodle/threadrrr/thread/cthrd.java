@@ -41,10 +41,10 @@ class numnutz extends Thread {
 			System.out.println("lolz, 1");
 			poot.shrek.notifyAll();
 		}
-		System.out.println("lolz");
+		System.out.println("@LOLZ");
 	}
 	public void lel() {
-		System.out.println("lel");
+		System.out.println("@LEL");
 	}
 }
 class maggots extends Thread {
@@ -83,6 +83,6 @@ class maggots extends Thread {
 			System.out.println("rofl, 2");
 			poot.shrek.notifyAll();
 		}
-		System.out.println("rofl");
+		System.out.println("@ROFL");
 	}
 }
