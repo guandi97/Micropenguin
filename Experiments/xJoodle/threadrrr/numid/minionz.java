@@ -1,14 +1,20 @@
-class nomnom {
+class nomnom extends Thread {
 	int i;
-	public static void nomnom() {
+	public static int note=0;
+	static Object dalock;
+	public static void nomnom(Object lelock) {
+		dalock=lelock;
 	}
-	private void run() {
+	public void run() {	
 	}
-	private void addr() {
+	public void addr() {
 	}
-	private void storr() {
+	public void storr() {
 	}
-	private void printr() {
+	public void printr() {
 	}
+}
+class neo {
+	volatile static int d=0;
 }
 
