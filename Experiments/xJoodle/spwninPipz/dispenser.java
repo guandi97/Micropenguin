@@ -2,7 +2,7 @@ import java.util.*;
 import java.lang.*;
 import java.nio.channels.*;
 
-class spwninPipz {
+class dispenser {
 	Pipe pinpoot=Pipe.open();
 
 	public static void main(String args[]) {
