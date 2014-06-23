@@ -2,9 +2,8 @@ import java.util.*;
 import java.lang.*;
 import java.ni.channels.*;
 
-class pootisSpencer extends Thread {
-	Pipe pinpoot=Pipe.SinkChannel(...);
-	Pipe powpoot=Pipe.SourceChannel(...);
+class pootiSpencer extends Thread {
+	Pipe sandvitch=new Pipe();
 
 	public static void main(String args[]) {
 	}
