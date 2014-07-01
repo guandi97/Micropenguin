@@ -6,18 +6,18 @@ class pootiSpencer {
 
 	public static void main(String args[]) {
 		PipedInputStream heavy=new PipedInputStream();		//read
+		PipedOutputStream rain=null;
 		try {
-			PipedOutputStream rain=new PipedOutputStream(heavy);
+			rain=new PipedOutputStream(heavy);
 		} catch(IOException e) {}
 
-		dispencer naow=new dispencer(heavy);
-		dispencer sandvitch=newDispencer(rain);
+		dispenser.flag=new boolean[2];
+		dispenser.dalock=new Object();
+		dispenser naow=new dispenser(0,heavy);
+		dispenser sandvitch=new dispenser(1,rain);
+
+		//gotta move that gear up
 		naow.start();
 		sandvitch.start();
-	}
-
-	public static void pstore() {
-	}
-	public static void psend() {
 	}
 }
