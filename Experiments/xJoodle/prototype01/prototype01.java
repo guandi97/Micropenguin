@@ -1,6 +1,4 @@
-import java.nio.file.*;
-import java.nio.*;
-import java.nio.charset.*;
+import java.io.*;
 
 //single thread for simplicity
 
@@ -23,11 +21,13 @@ class workDammnit {
 	//initialization
 
 		//variables
+		int i=0;
+		long l=0;
 		String sbuff=null;
 		String[] arrbuff=null;
 
 		//objects
-		ioNDfile.freader=new BufferedReader(args[0]);
+		ioNDfile.freader=new RandomAccessFile(args[0],"r");
 
 		//nestable classes 
 
@@ -36,8 +36,11 @@ class workDammnit {
 		//parse first word
 		//hand over line to appropriate class or do nothing if comment
 	//###########
-		//initial read line
-		ln=ioNDfile.freader.readLine();
+		//initial read line, and removal of blank|commented lines
+		do {
+			ln=ioNDfile.freader.readLine();
+		} while(ln.matches("(^\s*$|^\s*\\\\)");
+		
 		//check if eof
 		while(ln!=null) {
 			do {
@@ -47,7 +50,7 @@ class workDammnit {
 						//remove comments
 						//do something \w parenthesis
 						//error if anything else
-					//region
+					//function
 					//cmdsequence
 					//variable
 						//special case for parenthesis
@@ -63,21 +66,29 @@ class workDammnit {
 					arrbuff=ln.split("////");
 					ln=arrbuff[0];
 				}
-				//region
+				//function
 				if(ln.matches("^\s*\w.*\(.*\)") {
 					if(ln.matches("\s*\w.*\(.*\)\s+\{\s*$") /*}*/ { //lol, gotta escape that bracket for vim
 						brackets.flg=true;
 						ln=function.mngr(ln);
 					}
 					else {
-						ioNDfile.freader.mark(32);
-						sbuff=ioNDfile.freader.readLine()
-
+						//use mark to reset stream instead of holding next line in buffer to free resources
+						try {
+							l=ioNDfile.freader.getFilePointer();
+						} catch(IOException e) {
+							System.err.println(e);
+						}
+						//get rid of blank lines, and commeneted lines
+						do{
+							sbuff=ioNDfile.freader.readLine();
+						}while(sbuff.matches("(^\s*$|^\s*\\\\)");
+						
 						if(sbuff.matches("^\s*\{")) /*}*/ {
 							try {
-								ioNDfile.freader.reset();
+								ioNDfile.freader.seek(l);
 							} catch(IOException e) {
-								//find out why...
+								System.err.println(e);
 							}
 	
 							ln=function.mngr(ln);
@@ -95,7 +106,7 @@ class workDammnit {
 				else if(ln.matches("^\s*\w=.*") {
 					ln=variables.mngr(ln);
 				}
-				//brackets
+				//leading brackets
 				else if(ln.matches("^\s*\{") /*}*/ {
 					ln=upbracket(ln);
 				}
@@ -103,7 +114,9 @@ class workDammnit {
 					ln=dnbracket(ln);
 				}
 				else {
-					//...
+					//user error, does not match:
+						//: //,\n,$,\w=,builtins,\w(\w*),{,}
+					abort(user error);
 				}
 				
 				//check for trailing brackets
@@ -116,9 +129,11 @@ class workDammnit {
 					}
 				}
 	
-			} while(nxtLn==false && !ln.matches("^\s*$") {
+			} while(nxtLn==false && !ln.matches("^\s*$"); 	//make sure line isn't blank before parsing rest of said line
 				//read next line
-				ln=ioNDfile.freader.readLine();
+				do {
+					ln=ioNDfile.freader.readLine();
+				} while(ln.matches("(^\s*$|^\s*\\\\)");
 		}
 
 		//escape plan
@@ -211,7 +226,7 @@ class variables implements Mngr{
 	}
 }
 class ioNDfile {
-	static BufferedReader freader;
+	static RandomAccessFile freader;
 	
 	public static String eatStr(String ln,String regex) {
 		return ln;
