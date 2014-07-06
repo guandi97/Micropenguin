@@ -96,10 +96,10 @@ class workDammnit {
 					ln=variables.mngr(ln);
 				}
 				//brackets
-				else if(ln.matches("^\s*\{") \*}*\ {
+				else if(ln.matches("^\s*\{") /*}*/ {
 					ln=upbracket(ln);
 				}
-			\*{*\	else if(ln.matches("^\s*\}") {
+			/*{*/	else if(ln.matches("^\s*\}") {
 					ln=dnbracket(ln);
 				}
 				else {
@@ -108,10 +108,10 @@ class workDammnit {
 				
 				//check for trailing brackets
 				if(nxtLn==false) {
-					if(ln.matches("^\s\{") \*}*\ {
+					if(ln.matches("^\s\{") /*}*/ {
 						ln=upbracket(ln);
 					}
-				\*{*\	else if(ln.matches("^\s*\}") {					
+				/*{*/	else if(ln.matches("^\s*\}") {					
 						ln=dnbracket(ln);
 					}
 				}
@@ -126,13 +126,13 @@ class workDammnit {
 	}
 	private String upbracket(ln) {
 		brackets.lvlup();
-		ln=ioNDfile.eatStr(ln,"^\s*\{"); \*}*\ 
+		ln=ioNDfile.eatStr(ln,"^\s*\{"); /*}*/ 
 		nxtLn=false;
 		return ln;
 	}
 	private String dnbracket(ln) {
 		brackets.lvldn();
-	\*{*\	ln=ioNDfile.eatStr(ln,"^\s*\}");
+	/*{*/	ln=ioNDfile.eatStr(ln,"^\s*\}");
 		nxtLn=false;
 		return ln;
 	}
