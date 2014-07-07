@@ -39,7 +39,7 @@ class workDammnit {
 		//initial read line, and removal of blank|commented lines
 		do {
 			ln=ioNDfile.freader.readLine();
-		} while(ln.matches("(^\s*$|^\s*\\\\)");
+		} while(ln.matches("(^\s*$|^\s*\/\/.*)") {
 		
 		//check if eof
 		while(ln!=null) {
@@ -62,13 +62,16 @@ class workDammnit {
 				nxtLn=true;
 
 				//comment parsing
-				if(ln.matches("////") {
-					arrbuff=ln.split("////");
-					ln=arrbuff[0];
+				if(ln.matches("\/\/.*$") {
+					ln=ln.replace("\/\/.*$","");
 				}
 				//function
-				if(ln.matches("^\s*\w.*\(.*\)") {
-					if(ln.matches("\s*\w.*\(.*\)\s+\{\s*$") /*}*/ { //lol, gotta escape that bracket for vim
+				if(ln.matches("^\\s*\\b(\\w|\\d)+\\(((\\$(\\w|\\d)+\\[\\d+]|(\\w|\\d)+)*\\s*,\\s*)*((\\$(\\w|\\d)+\\[\\d+]|(\\w|\\d)+)\\s*)\\)(\\s*\\{)*(\\s*$|\\/{2}.*$)")) {
+						//set function name
+						ln=ln.trim();
+						sbuff=ln.replace("\(.*$","");
+						function.fctnName=sbuff;
+					if(ln.matches("\\s*\\b(\\w|\\d)+\\(((\\$(\\w|\\d)+\\[\\d+]|(\\w|\\d)+)*\\s*,\\s*)*((\\$(\\w|\\d)+\\[\\d+]|(\\w|\\d)+)\\s*)\\)\\s*\\{.*$") /*}*/ { //lol, gotta escape that bracket for vim
 						brackets.flg=true;
 						ln=function.mngr(ln);
 					}
@@ -80,11 +83,12 @@ class workDammnit {
 							System.err.println(e);
 						}
 						//get rid of blank lines, and commeneted lines
-						do{
+						do {
 							sbuff=ioNDfile.freader.readLine();
-						}while(sbuff.matches("(^\s*$|^\s*\\\\)");
+						} while(sbuff.matches("(^\s*$|^\s*\/\/.*)");
 						
-						if(sbuff.matches("^\s*\{")) /*}*/ {
+						//find " {"
+						if(sbuff.matches("^\s*\{(\s*$|\s*\/\/.*$)") /*}*/ {
 							try {
 								ioNDfile.freader.seek(l);
 							} catch(IOException e) {
@@ -130,10 +134,10 @@ class workDammnit {
 				}
 	
 			} while(nxtLn==false && !ln.matches("^\s*$"); 	//make sure line isn't blank before parsing rest of said line
-				//read next line
+				//read next line rm blank/comment
 				do {
 					ln=ioNDfile.freader.readLine();
-				} while(ln.matches("(^\s*$|^\s*\\\\)");
+				} while(ln.matches("(^\s*$|^\s*\/\/.*)");
 		}
 
 		//escape plan
@@ -171,6 +175,10 @@ class parenthesis {
 		parlvl++;
 	}
 	public static lvldn() {
+		parlvl--;
+		//..variables, etc
+		//rm function status if global scope
+		if(parlvl==0) function.fctnName=null;
 	}
 }
 class brackets {
@@ -198,13 +206,13 @@ class brackets {
 	}
 }
 class variables implements Mngr{
-	public Stack<int> varsize;
-	public Stack<int[]> typevar;
+	public static Stack<int> varsize;
+	public static Stack<int[]> typevar;
 		//0=number
 		//1=String
 		//2=cmdsequence
-	public Stack<String[]> varStack;	//be careful, public access risky; suggest final product be private
-	public Stack<String> varname;
+	public static Stack<String[]> varStack;	//be careful, public access risky; suggest final product be private
+	public static Stack<String> varname;
 
 	static {
 		varsize=new Stack<int>();
@@ -226,14 +234,18 @@ class variables implements Mngr{
 	}
 }
 class ioNDfile {
-	static RandomAccessFile freader;
+	public static RandomAccessFile freader;
 	
 	public static String eatStr(String ln,String regex) {
 		return ln;
 	}
 }
 class function implements Mngr {
+	public static boolean parflg;
+	public static String fctnName;
+
 	static {
+		fctnName=null;
 		parflg=false;
 	}
 	public void mngr(String ln) {

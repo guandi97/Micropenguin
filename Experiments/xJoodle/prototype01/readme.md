@@ -23,3 +23,5 @@ does not include developement on:
 -dedicated loop constructs (this one has forloop capabilities, but it's pretty weak)
 
 -multi-threading
+
+-networking
