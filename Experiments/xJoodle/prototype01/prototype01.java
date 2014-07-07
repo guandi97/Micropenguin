@@ -39,7 +39,7 @@ class workDammnit {
 		//initial read line, and removal of blank|commented lines
 		do {
 			ln=ioNDfile.freader.readLine();
-		} while(ln.matches("(^\s*$|^\s*\/\/.*)") {
+		} while(ln.matches("(^\\s*$|^\\s*\\/\\/.*)") {
 		
 		//check if eof
 		while(ln!=null) {
@@ -62,8 +62,8 @@ class workDammnit {
 				nxtLn=true;
 
 				//comment parsing
-				if(ln.matches("\/\/.*$") {
-					ln=ln.replace("\/\/.*$","");
+				if(ln.matches("\\/\\/.*$") {
+					ln=ln.replace("\\/\\/.*$","");
 				}
 				//function
 				if(ln.matches("^\\s*\\b(\\w|\\d)+\\(((\\$(\\w|\\d)+\\[\\d+]|(\\w|\\d)+)*\\s*,\\s*)*((\\$(\\w|\\d)+\\[\\d+]|(\\w|\\d)+)\\s*)\\)(\\s*\\{)*(\\s*$|\\/{2}.*$)")) {
@@ -85,7 +85,7 @@ class workDammnit {
 						//get rid of blank lines, and commeneted lines
 						do {
 							sbuff=ioNDfile.freader.readLine();
-						} while(sbuff.matches("(^\s*$|^\s*\/\/.*)");
+						} while(sbuff.matches("(^\\s*$|^\\s*\\/\\/.*)");
 						
 						//find " {"
 						if(sbuff.matches("^\s*\{(\s*$|\s*\/\/.*$)") /*}*/ {
@@ -137,7 +137,7 @@ class workDammnit {
 				//read next line rm blank/comment
 				do {
 					ln=ioNDfile.freader.readLine();
-				} while(ln.matches("(^\s*$|^\s*\/\/.*)");
+				} while(ln.matches("(^\\s*$|^\\s*\\/\\/.*)");
 		}
 
 		//escape plan
