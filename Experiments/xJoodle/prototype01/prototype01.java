@@ -71,7 +71,7 @@ class workDammnit {
 						ln=ln.trim();
 						sbuff=ln.replace("\(.*$","");
 						function.fctnName=sbuff;
-					if(ln.matches("\\s*\\b(\\w|\\d)+\\(((\\$(\\w|\\d)+\\[\\d+]|(\\w|\\d)+)*\\s*,\\s*)*((\\$(\\w|\\d)+\\[\\d+]|(\\w|\\d)+)\\s*)\\)\\s*\\{.*$") /*}*/ { //lol, gotta escape that bracket for vim
+					if(ln.matches("^\\s*\\b(\\w|\\d)+\\(((\\$(\\w|\\d)+\\[\\d+]|(\\w|\\d)+)*\\s*,\\s*)*((\\$(\\w|\\d)+\\[\\d+]|(\\w|\\d)+)\\s*)\\)\\s*\\{.*$")) /*}*/ { 
 						brackets.flg=true;
 						ln=function.mngr(ln);
 					}
@@ -88,7 +88,7 @@ class workDammnit {
 						} while(sbuff.matches("(^\\s*$|^\\s*\\/\\/.*)");
 						
 						//find " {"
-						if(sbuff.matches("^\s*\{(\s*$|\s*\/\/.*$)") /*}*/ {
+						if(sbuff.matches("^\\s*\\{(\\s*$|\\s*\\/\\/.*$)") /*}*/ {
 							try {
 								ioNDfile.freader.seek(l);
 							} catch(IOException e) {
@@ -103,15 +103,16 @@ class workDammnit {
 					}
 				}
 				//cmdsequence
-				else if(ln.matches("^\s*\$\(\w*\)") {
+				else if(ln.matches("^\\s*\\$\\(.+\\)\\s*$")) {
 					//parse parenthesis
 				}
 				//variables
-				else if(ln.matches("^\s*\w=.*") {
+				else if(ln.matches("\\s*\\b(\\w|\\d)+\\s*=.*") {
 					ln=variables.mngr(ln);
 				}
 				//leading brackets
-				else if(ln.matches("^\s*\{") /*}*/ {
+				else if(ln.matches("^\\s*\\{") /*}*/ {
+					nxtLn=false;
 					ln=upbracket(ln);
 				}
 			/*{*/	else if(ln.matches("^\s*\}") {
