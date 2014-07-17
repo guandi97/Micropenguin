@@ -1,7 +1,12 @@
 import java.io.*;
 
 class ioNdFile {
+	public static int lnNum;
 	public static RandomAccessFile cmdreadrr;
+
+	static {
+		lnNum=0;
+	}
 
 	public static String readScptLn() {
 		String ln=null;
@@ -18,6 +23,7 @@ class ioNdFile {
 		} while(ln.matches("(^$|^\\/\\/.*$)"));
 		ln=ln.replace("\\/\\/.*$","");
 		System.err.println(ln);
+		lnNum++;
 		return ln;
 	}
 }
