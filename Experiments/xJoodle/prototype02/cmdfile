@@ -1,0 +1,47 @@
+//some mock up
+
+LOLZ=("SAXTON HALE","OP")
+
+pyro{"MMMMMHHHHH lolz")
+	lolz=$(stdout($(stdout($pyro[0]) | rmtail())) | lowercase() | append($(stdout("MMMMMHHHHH") | append(" ")) | reverse()) | print())
+	$(echo("again!") | print() | print())
+}
+spy{"fire","fire","FIRE!")
+	lolz="stdout($spy[$I]) | print()"
+	YELL=$spy
+	for(I=0;I<3;I++) {
+		$(lolz)
+	}
+}
+heavy{"doktor!","meeedic")
+	for(I=0;I<2;I++) {
+		$(stdout(heavy[$I]) | for("I=0;I<2;I++",$(print())))
+	}
+}
+engineer{)
+	lolz=(1,2,3,4,5)
+	//last index+1
+	lolz[#+1]=6
+	//remove 1st index
+	lolz[1d]
+	//removes last 2
+	lolz[-2d]
+	//print size
+	$(stdout(#lolz) | toString() | print())
+	//print access range
+	$(stdout($lolz[0,1]) | toString() | print())
+	//print all
+	$(stdout($lolz) | toString() | print())
+
+}
+
+//stdout
+//echo
+//rmtail
+//lowercase
+//reverse
+//print
+//size
+//for loops
+//variables
+//functions
