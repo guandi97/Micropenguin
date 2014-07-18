@@ -9,12 +9,14 @@ pyro{)
 spy{)
 	lolz="stdout($spy[$I]) | print()"
 	YELL=$spy
-	for(I=0;I<3;I++) {
+	for(I=0;I<3;I++) 
+	{
 		$(lolz)
 	}
 }
 heavy{)
-	for(I=0;I<2;I++) {
+	for(I=0;I<2;I++) 
+	{
 		$(stdout(heavy[$I]) | for("I=0;I<2;I++",$(print())))
 	}
 }

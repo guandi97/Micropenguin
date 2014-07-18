@@ -27,6 +27,8 @@ class nooope {
 		fnctshunz fnctshunz=new fnctshunz();
 		veriblz veriblz=new veriblz();
 		cmdsquenz cmdsquenz=new cmdsquenz();
+		braketz braketz=new braketz();
+		parenfezez parenfezez=new parenfezez();
 
 		//**body
 
@@ -35,17 +37,23 @@ class nooope {
 		while(ln!=null) {
 			//function
 			if(ln.matches("^\\b(\\w|\\d)+\\{(\\w|\\d)*(,(\\w|\\d)+)*\\)$")) /*}*/ {
+				fnctshunz.mngr(ln);
+				braketz.lvlup();
 			}
 			//variable
-			else if(ln.matches("\\b(\\w|\\d)+=.*")) {
+			else if(ln.matches("^\\b(\\w|\\d)+(\\[.+])*(=.+)?$")) {
+				veriblz.mngr(ln);
 			}
 			//cmdsequence
-			else if(ln.matches("\\$\\(.+\\)\\s*$")) {
+			else if(ln.matches("^\\$\\(.+\\)\\s*$")) {
+				cmdsquenz.mngr(ln);
 			}
 			//brackets
-			else if(ln.matches("\\{\\s*$")) /*}*/ {
+			else if(ln.matches("^\\{\\s*$")) /*}*/ {
+				braketz.lvlup();
 			}
 		/*{*/	else if(ln.matches("}\\s*$")) {
+				braketz.lvldn();
 			}
 			else {
 				//hand over to builtins

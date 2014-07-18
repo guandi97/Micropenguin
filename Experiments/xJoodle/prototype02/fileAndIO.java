@@ -22,7 +22,7 @@ class ioNdFile {
 			}
 		} while(ln.matches("(^$|^\\/\\/.*$)"));
 		ln=ln.replace("\\/\\/.*$","");
-		System.err.println(ln);
+		System.err.format("\t%s\n",ln);
 		lnNum++;
 		return ln;
 	}

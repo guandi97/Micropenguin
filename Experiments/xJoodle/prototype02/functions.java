@@ -8,7 +8,10 @@ class fnctshunz implements mngr {
 	}
 
 	public void mngr(String ln) {
+		System.err.println("functions");
 		//ln splitting;
-
+		
+		//arguments
+		//...
 	}
 }
