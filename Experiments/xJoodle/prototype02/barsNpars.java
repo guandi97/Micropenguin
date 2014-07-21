@@ -15,12 +15,12 @@ class braketz implements nestle {
 	}
 	public void lvlup() {
 		lvl++;
-		mark.push(veriblz.stack.size());
+		mark.push(veriblz.varStack.size());
 		System.err.println("brkt lvlup: "+lvl);
 	}
 	public void lvldn() {
 		lvl--;
-		veriblz.removeRng(mark.pop(),veriblz.stack.size());
+		veriblz.removeRng(mark.pop(),veriblz.varStack.size());
 		System.err.println("brkt lvldn: "+lvl);
 	}
 }
