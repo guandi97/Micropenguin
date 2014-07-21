@@ -111,8 +111,7 @@ class veriblz implements mngr {
 		if(str.matches("^.*#.*$")) {
 			if(str.matches("^--#$")) {
 			} else if(str.matches("^\\+\\+#$")) {
-			} else if(str.matches("^\\d+\\+#$")) {
-			} else if(str.matches("^#(\\+|-)\\d+$")) {
+			} else //if(...math parser)
 			}
 		} else if(str.matches("^\\d+$")) {
 		} else if(str.matches("^.*\\$\\(.*\\)$")) {
