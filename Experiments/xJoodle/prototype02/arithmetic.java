@@ -1,4 +1,4 @@
-class math implements mngr {
+class math {
 	public static String[] varSyms={
 				"#",	//size of
 				"$" 	//end of
@@ -13,83 +13,71 @@ class math implements mngr {
 				2.71,
 					};	
 
-	public void mngr(String ln) {
+	public static Double parser(String ln) {
 		char[] lnArr=ln.toCharArray();
 		double temp=0;
 		double finn=0;
 		int parflg=0;
+		int sinflg=1;
 		boolean numflg=false;
 		boolean negflg=false;
 		int i=0,j=0;
 
-		if(lnArr[0]=='-') {
-			negflg=true;
-			j=1;
+		if(!ln.matches("^\\d.*$|^(-|\\+)\\d.*$")) {
+			System.err.println("syntax +- error");
+			System.exit(0);
 		}
-		for(j=j;i<lnArr.length;i++) {
-			if (
-				numflg=true && (
-				lnArr[j]!='0' ||
-				lnArr[j]!='1' ||
-				lnArr[j]!='2' ||
-				lnArr[j]!='3' ||
-				lnArr[j]!='4' ||
-				lnArr[j]!='5' ||
-				lnArr[j]!='6' ||
-				lnArr[j]!='7' ||
-				lnArr[j]!='8' ||
-				lnArr[j]!='9' ||
-				lnArr[j]!='.' )
-				)
-			{
-				temp=Double.parseDouble(new String(lnArr,i,j-i));
+		for(j=j;j<lnArr.length;j++) {
+			if(numflg==true && ln.substring(j,j+1).matches("(\\D|\\[^\\.])")) { //!num
 				numflg=false;
-				if(negflg==true) {
-					temp*=-1;
-					negflg=false;
-				}
-			}
-			if(lnArr[j]=='(') /*)*/ {
-				if(lnArr[j+1]=='-') {
-					negflg=true;
-					j++;
-				}
-				parflg++;
-			} else if( /*(*/ lnArr[j]==')') {
-				if(parflg<0) {
-					System.err.println("math par error");
-					System.exit(0);
-				}
-				else {
-					parflg--;
-				}
-			} else if (
-				numflg==false && (
-				lnArr[j]=='0' ||
-				lnArr[j]=='1' ||
-				lnArr[j]=='2' ||
-				lnArr[j]=='3' ||
-				lnArr[j]=='4' ||
-				lnArr[j]=='5' ||
-				lnArr[j]=='6' ||
-				lnArr[j]=='7' ||
-				lnArr[j]=='8' ||
-				lnArr[j]=='9' ||
-				lnArr[j]=='.' )
-				)
+				System.err.format("i: %d j: %d finn: %d\n",i,j,(int)finn);
+				temp=Double.parseDouble(ln.substring(i,j));
 
-			{
+				if(sinflg==1) {
+					System.err.println("+");
+					finn+=temp;
+				} else if(sinflg==2) {
+					System.err.println("-");
+					finn-=temp;
+				} else if(sinflg==3) {
+					System.err.println("*");
+					finn*=temp;
+				} else if(sinflg==4) {
+					System.err.println("/");
+					finn/=temp;
+				}
+				System.err.format("temp: %d finn: %d\n",(int)temp,(int)finn);
+			}
+
+			if(lnArr[j]=='+') {
+				sinflg=1;
+			} else if(lnArr[j]=='-') {
+				sinflg=2;
+			} else if(lnArr[j]=='*') {
+				sinflg=3;
+			} else if(lnArr[j]=='/') {
+				sinflg=4;
+			} else if(numflg==false && ln.substring(j,j+1).matches("(\\d|\\.)")) {
 				i=j;
 				numflg=true;
-			} else if(lnArr[j]=='+') {
-				finn+=temp;
-			} else if(lnArr[j]=='-') {
-				finn-=temp;
-			} else if(lnArr[j]=='*') {
-				finn*=temp;
-			} else if(lnArr[j]=='/') {
-				finn/=temp;
 			}
 		}
+		temp=Double.parseDouble(ln.substring(i,j));
+		if(sinflg==1) {
+			System.err.println("+");
+			finn+=temp;
+		} else if(sinflg==2) {
+			System.err.println("-");
+			finn-=temp;
+		} else if(sinflg==3) {
+			System.err.println("*");
+			finn*=temp;
+		} else if(sinflg==4) {
+			System.err.println("/");
+			finn/=temp;	
+		}
+		System.err.format("temp: %d finn: %d\n",(int)temp,(int)finn);
+		
+		return finn;
 	}
 }
