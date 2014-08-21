@@ -4,7 +4,7 @@ interface nestle {
 	public void lvlup();
 	public void lvldn();
 }
-
+//static
 class braketz implements nestle {
 	public static int lvl;
 	public static Stack<Integer> mark;
@@ -13,20 +13,21 @@ class braketz implements nestle {
 		lvl=0;
 		mark=new Stack<Integer>();
 	}
-	public void lvlup() {
+	public static void lvlup() {
 		lvl++;
 		mark.push(veriblz.varStack.size());
 		System.err.println("brkt lvlup: "+lvl);
 	}
-	public void lvldn() {
+	public static void lvldn() {
 		lvl--;
 		veriblz.removeRng(mark.pop(),veriblz.varStack.size());
 		System.err.println("brkt lvldn: "+lvl);
 	}
 }
+//!static
 class parenfezez implements nestle {
-	public static int lvl;
-	static {
+	public int lvl;
+	void parenfezez {
 		lvl=0;
 	}
 	public void lvlup() {

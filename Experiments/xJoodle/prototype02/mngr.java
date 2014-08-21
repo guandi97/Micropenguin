@@ -1,3 +1,3 @@
 interface mngr {
-	public void mngr(String ln);
+	public String mngr(String ln);
 }

@@ -1,3 +1,4 @@
+//!static
 import java.util.*;
 
 class fnctshunz implements mngr {
@@ -7,11 +8,12 @@ class fnctshunz implements mngr {
 		fnctID=new Stack<String>();
 	}
 
-	public void mngr(String ln) {
+	public String mngr(String ln) {
 		System.err.println("functions");
 		//ln splitting;
 		
 		//arguments
 		//...
+		return ln;
 	}
 }

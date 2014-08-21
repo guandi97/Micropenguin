@@ -1,0 +1,2 @@
+from visual import *
+sphere()

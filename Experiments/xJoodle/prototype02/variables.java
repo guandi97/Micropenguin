@@ -1,13 +1,18 @@
+//!static
 import java.util.*;
 
-class veriblz implements mngr {
+class veriblz {
 	public static Stack<String> nameStack;
 	public static Stack<Stack<String>> varStack;
 	public static Stack<Stack<Integer>> typeStack;
 		//0-number
 		//1-String
 		//2-cmdsequence
+	cmdsquenz cmdsquenz;
+	lnParse lnParse;
 	static {
+		cmdsquenz=new cmdsquenz();
+		lnParse=new lnParse();
 		//initialize containing collection
 		nameStack=new Stack<String>();
 		varStack=new Stack<Stack<String>>();
@@ -36,7 +41,7 @@ class veriblz implements mngr {
 			}
 			varStack.setElementAt(varOps(ln,varStack.elementAt(index)),index);
 		} else {
-			System.err.println("not varOp");
+			System.err.println("varSet");
 			name=arrbuff[0];
 			ln=arrbuff[1];		
 			
@@ -98,9 +103,7 @@ class veriblz implements mngr {
 	}
 	public String arrSet(String ln) {
 		System.err.println("arrset");
-		String leStr=null;
-
-		return leStr;
+		return lnParse.mngr(ln);
 	}
 	public Stack<String> varOps(String ln,Stack<String> leStack) {
 		System.err.println("varOps");
@@ -108,16 +111,8 @@ class veriblz implements mngr {
 		return leStack;
 	}
 	public int parseIndex(String str) {
-		if(str.matches("^.*#.*$")) {
-			if(str.matches("^--#$")) {
-			} else if(str.matches("^\\+\\+#$")) {
-			} else //if(...math parser)
-			}
-		} else if(str.matches("^\\d+$")) {
-		} else if(str.matches("^.*\\$\\(.*\\)$")) {
-		}
-		int i=0;
-		return i;
+		str=cmdsquenz.reaprr(str);
+		return jepRprrr.exprParse(str);
 	}
 	public static void removeRng(int i,int j) {
 		i--;

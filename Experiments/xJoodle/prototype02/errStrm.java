@@ -1,3 +1,4 @@
+//static
 import java.io.*;
 
 class errStrm {
