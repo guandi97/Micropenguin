@@ -23,6 +23,10 @@ class daBoss {
 				si+=Integer.parseInt(ain[1]);
 				killdem(Integer.parseInt(ain[1]),thrdz);
 			}
+			else if(uin.matches("^killall$")) {
+				genocide(thrdz,nemo,si,di);
+				si=di;
+			}
 			else if(uin.matches("^add(\\s\\d+){3}$")) {
 				addem(Integer.parseInt(ain[1]),Integer.parseInt(ain[2]),Integer.parseInt(ain[3]),thrdz,nemo.dalock);
 			}
@@ -92,5 +96,14 @@ class daBoss {
 		for(int i=si;i<di;i++) {
 			System.out.format("Thread %d: %d\n",i,thrdz.get(i-si).ratad);
 		}
+	}
+	public static void genocide(Stack<nomnom> thrdz,neo nemo,int si,int di) {
+		for(int i=si;i<di;i++) {
+			thrdz.get(i-si).terminateflg=true;
+		}
+		synchronized(nemo.dalock) {
+			nemo.dalock.notifyAll();
+		}
+		thrdz.remove(di-si-1);
 	}
 }
