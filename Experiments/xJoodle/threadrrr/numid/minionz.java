@@ -26,7 +26,7 @@ class nomnom extends Thread {
 			}
 			note=0;
 		}
-		return;
+		stop();
 	}
 	public void giver() {
 		neo.datar=ratad;
@@ -43,7 +43,7 @@ class nomnom extends Thread {
 	}
 	public void getr() {
 		synchronized(nemo.dalock) {
-			while(neo.i>2) {
+			while(neo.i<2) {
 				try {
 					nemo.dalock.wait();
 				} catch(InterruptedException e) {}
@@ -58,4 +58,3 @@ class neo {
 	public volatile static int datar=0;
 	public volatile static int i=0;
 }
-
